@@ -4,7 +4,7 @@ class AjaxController extends BaseController {
 
     public function getUsers()
     {
-        $users = User::select([
+        $users = User::select([ 
             'UserProfileID as id',
             'FirstName',
             'MiddleName',
