@@ -1,0 +1,95 @@
+#account-type {
+  border: 2px solid pink;
+}
+
+.portal-table {
+  border: none !important;
+  padding: 1em 0 !important;
+}
+
+.activ {
+  background: rgba(23, 21, 21, 0.06) none repeat scroll 0% 0% !important;
+}
+
+#logo-img {
+  height:90px;
+  width: auto;
+}
+
+#layout {
+  width: 80%;
+  margin: 1em auto;
+}
+
+#heading {
+  color: #096E10;
+}
+
+#landing {
+  background: #fff;
+  box-shadow: 0 5px 10px #888;
+  margin-bottom: 3em;
+}
+
+#main {
+  margin-bottom: 1em;
+}
+
+#header {
+  background-color: #ffffff;
+  box-shadow: 0 5px 10px #888;
+  height: 100px;
+}
+
+#dashboard {
+  margin-bottom: 1em;
+}
+
+#dashboard-header {
+  margin: 0;
+  padding: 1em 0;
+}
+
+#dashboard-header .left.floated.header {
+  margin: 0;
+}
+
+#dashboard-menu {
+  margin: 0;
+}
+
+#dashboard-menu > .column {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.value {
+  font-size: 0.8em !important;
+}
+
+#dashboard-header .individual.sub.header {
+  color: #d95c5c !important;
+}
+
+#dashboard-header .business.sub.header {
+  color: #66c17b !important;
+}
+
+
+
+#window {
+  margin: 1em auto;
+}
+
+#viewport {
+  margin: 0 1em;
+  padding: 0.3em;
+  padding-bottom: 2.3em;
+  background: #FAFAFA;
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.1);
+}
+
+#feature {
+  height: 30em;
+  overlow: auto !important;
+}

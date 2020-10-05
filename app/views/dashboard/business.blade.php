@@ -1,0 +1,90 @@
+@extends('dashboard.manage')
+
+@section('dashboard-content')
+    <form class="ui form" action="{{ route('post.add.business') }}" method="post" enctype="multipart/form-data">
+
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+        <h3 class="ui dividing header" style="margin-top: 0;">Business Registration</h3>
+
+        @foreach ($form->sections() as $section )
+            @if ($section->Show)
+                @if ( count($section->columns()) > 0 )
+                    <div class="ui attached segment">
+                        <h5 class=" ui dividing header">{{$section}} </h5>
+                        <div class="ui basic segment">
+                            @foreach($section->columns() as $col)
+                                {{Api::CustomFormField($col->id())}}
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="ui hidden divider"></div>
+                @endif
+            @endif
+        @endforeach
+
+        @foreach ($location->sections() as $section )
+            @if ($section->Show && !$section->Optional)
+                @if ( count($section->columns()) > 0 )
+                    <div class="ui attached segment">
+                        <h4 class=" ui dividing header">{{$section}} </h4>
+                        <div class="ui basic segment">
+                            @foreach($section->columns() as $col)
+                                {{Api::CustomFormField($col->id())}}
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="ui hidden divider"></div>
+                @endif
+            @endif
+        @endforeach
+
+        <div class="ui section divider"></div>
+
+        <button class="ui fluid green button"> Submit </button>
+
+    </form>
+@endsection
+
+@section('script')
+
+    <script type="text/javascript">
+        $( document ).ready(function() {
+          console.log('dedupe');
+
+          locate();
+
+          function locate() {
+            $("#11203").change(function(){
+              $.get(('/searchwards/' + $("#11203").val()), function(data) {
+                var t = '';
+                var res = JSON.parse(data);
+                console.log('res', res);
+                if(res.status == 'done') {
+                  res.data.map(function(_) {t += '<option value="'+ _.WardID +'" selected>'+ _.WardName + '</option>';});
+                  $("#11204").html(t);
+                  $("#11204").parent().dropdown('set text', 'Select Ward');
+
+                  $("#11204").change(function() {
+                    $.get(('/searchzones/' + $("#11204").val()), function(data) {
+                      var t = '';
+                      var res = JSON.parse(data);
+                      if(res.status == 'done') {
+                        res.data.map(function(_) {t += '<option value="'+ _.ZoneID +'" selected>'+ _.ZoneName + '</option>';});
+                        $("#11202").html(t);
+                        $("#11202").parent().dropdown('set text', 'Select Zone');
+                      }
+                    });
+                  });
+                }
+              });
+
+            })
+          }
+            $('#dashboard-menu #manage').trigger('click');
+            $('.ui.accordion').accordion();
+            $('.ui.dropdown').dropdown();
+            $('#department-menu').accordion('open', 0);
+        });
+    </script>
+@endsection

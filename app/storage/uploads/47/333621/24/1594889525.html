@@ -1,0 +1,264 @@
+<?php
+  include_once 'include/db.inc.php';
+?>
+
+<!Doctype html>
+<html>
+<head>
+<title>
+TOURISM AND HOSPITALITY WORKFORCE F=REGISTRATION FORM
+</title>
+<link rel="stylesheet" href>
+</head>
+<body>
+<div>
+<main>
+<p>Tourism Regulatory Authority, in accordance with the Tourism Act 2911,is charged
+with registering all persons working in the Tourism and Hospitality sector. This is with a view to establis existing qualifications and competencies as a basis for the development if a framework for quality workforce relevant for industry needs in enhancing services quality to customers.
+</p>
+<p>
+All the Information provided in this form shall be for office use only and will be treated with ytmost confidentiality.
+</p>
+<form class="workforce-form" action="workforce.html" method="post">
+<form>
+<label for = "surname"> <b> Surname </b> </label>
+<input type="text" name="surname" placeholder="Surname">
+<label for = "othernames"> <b> Other Names </b> </label>
+<input type="text" name="othernames" placeholder="Other Names">
+<label for = "nationality"> <b> Nationality </b> </label>
+<input type="text" name="nationality" placeholder="Nationality">
+<label for = "idnumber"> <b> ID/Passport Number </b> </label>
+<input type="integer" name="idnumber" placeholder="ID/Passport Number">
+<div>
+<label for = "gender"> <b> Gender </b> </label>
+<input type="radio" name="gender"
+<?php if (isset($gender) && $gender=="female") echo "checked";?>
+Female
+<input type="radio" name="gender"
+<?php if (isset($gender) && $gender=="male") echo "checked";?>
+Male
+<input type="radio" name="gender"
+<?php if (isset($gender) && $gender=="other") echo "checked";?>
+Other
+</div>
+<label for = "physicaladdress"> <b> Physical Address </b> </label>
+<input type="text" name="physicaladdress" placeholder="Physical Address">
+<label for="cars"><b>County</b></label>
+<select id="county">
+  <option value="mombasa">Mombasa</option>
+  <option value="kwale">Kwale</option>
+  <option value="kilifi">Kilifi</option>
+  <option value="tanariver">Tana River</option>
+  <option value="5">Taita-Taveta</option>
+  <option value="6">Lamu</option>
+  <option value="7">Garissa</option>
+  <option value="8">Wajir</option>
+  <option value="9">Mandera</option>
+  <option value="10">Marsabit</option>
+  <option value="11">Isiolo</option>
+  <option value="12">Meru</option>
+  <option value="13">Tharaka Nithi</option>
+  <option value="14">Embu</option>
+  <option value="15">Kitui</option>
+  <option value="16">Machakos</option>
+  <option value="17">Makueni</option>
+  <option value="18">Nyandarua</option>
+  <option value="19">Nyeri</option>
+  <option value="20">Kirinyaga</option>
+  <option value="21">Murang'a</option>
+  <option value="22">Kiambu</option>
+  <option value="23">Turkana</option>
+  <option value="24">West Pokot</option>
+  <option value="25">Samburu</option>
+  <option value="26">Trans Nzoia</option>
+  <option value="27">Uasin Gishu</option>
+  <option value="28">Elgeyo-Marakwet</option>
+  <option value="29">Nandi</option>
+  <option value="30">Baringo</option>
+  <option value="31">Laikipia</option>
+  <option value="32">Nakuru</option>
+  <option value="33">Narok</option>
+  <option value="34">Kajiado</option>
+  <option value="35">Kericho</option>
+  <option value="36">Bomet</option>
+  <option value="37">Kakamega</option>
+  <option value="38">Vihiga</option>
+  <option value="39">Bungoma</option>
+  <option value="40">Busia</option>
+  <option value="41">Siaya</option>
+  <option value="42">Kisumu</option>
+  <option value="43">Homa Bay</option>
+  <option value="44">Migori</option>
+  <option value="45">Kisii</option>
+  <option value="46">Nyamira</option>
+  <option value="47">Nairobi</option>
+</select>
+<label for = "subcounty"> <b> Sub-County </b> </label>
+<input type="text" name="subcounty" placeholder="subcounty">
+<label for = "town"> <b> Town </b> </label>
+<input type="text" name="town" placeholder="Town">
+<label for = "personaladdress"> <b> Personal Address </b> </label>
+<input type="text" name="personaladdress" placeholder="Personal Address">
+<label for = "postaladdress"> <b> Postal Address </b> </label>
+<input type="integer" name="postaladdress" placeholder="Postal Address">
+<label for = "code"> <b> Code </b> </label>
+<input type="integer" name="code" placeholder="Code">
+<label for = "mobileno"> <b> Mobile Number </b> </label>
+<input type="integer" name="mobileno" placeholder="Mobile No.">
+<label for = "email"> <b> Email </b> </label>
+<input type="text" name="email" placeholder="Email">
+</form>
+</div>
+<div>
+<form
+<p>
+QUALIFICATION AND EMPLOYMENT INFORMATION
+</p>
+<title>
+  Academic Qualifications
+</title>
+<p> Qualification Level(Tick where mist appropriate)
+  </p>
+<input type="checkbox" id="phd" name="phd" value="phd">
+<label for="phd"> PHD </label> <input type="file" name="Choose File" id="phddoc"><br>
+<label for="masters"> Masters </label>
+<input type="checkbox" id="masters" name="masters" value="masters">
+<input type="file" name="Choose File" id="mastersdoc"><br>
+<br>
+<label for="degree"> Degree </label>
+<input type="checkbox" id="degree" name="degree" value="degree">
+<input type="file" name="Choose File" id="degreedoc"><br>
+<label for="highernationaldiploma"> Higher National Diploma</label> 
+<input type="checkbox" id="highernationaldiploma" name="highernationaldiploma" value="highernationaldiploma">
+<input type="file" name="Choose Fiel" id="highernationaldiplomadoc"><br>
+<label for="diploma"> Diploma </label> 
+<input type="checkbox" id="diploma" name="diploma" value="diploma">
+<input type="file" name="Choose Fiel" id="diplomadoc"><br>
+<label for="craft"> Craft </label>
+<input type="checkbox" id="craft" name="craft" value="craft">
+<input type="file" name="Choose Fiel" id="craftdoc"><br>
+<label for="artisan"> Artisan </label>
+<input type="checkbox" id="artisan" name="artisan" value="artisan">
+<input type="file" name="Choose Fiel" id="artisandoc"><br>
+<label for="informal"> Informal </label>
+<input type="checkbox" id="informal" name="informal" value="informal">
+<input type="file" name="Choose Fiel" id="informaldoc"><br>
+<label for="alevel"> A-Level </label>
+<input type="checkbox" id="alevel" name="alevel" value="alevel">
+<input type="file" name="Choose Fiel" id="aleveldoc"><br>
+<label for="olevel"> O-Level </label>
+<input type="checkbox" id="olevel" name="olevel" value="olevel">
+<input type="file" name="Choose Fiel" id="oleveldoc"><br>
+<label for="olevel"> Below O-Level</label>
+<input type="checkbox" id="belowolevel" name="belowolevel" value="belowolevel">
+<input type="file" name="Choose Fiel" id="belowoleveldoc"><br>
+
+</form>
+</div>
+<div>
+  <form>
+    <title>
+      Proffessional Qualification Level
+    </title>
+    <p> Area of Qualification(Tick only one are where most applicable to your professional Qualification)
+        </p>
+        <label for="tourism"> A. TOURISM </label><br>
+<input type="checkbox" id="tourismmanagement" name="tourismmanagement" value="tourismmanagement">
+<label for="tourismmanagement"> Tourism Management </label><br>
+<input type="checkbox" id="traveloperation" name="traveloperation" value="traveloperation">
+<label for="traveloperation"> Travel Operation </label><br>
+<input type="checkbox" id="naturalist" name="naturalist" value="naturalist">
+<label for="naturalist"> Naturalist </label><br>
+<input type="checkbox" id="ornithology" name="ornithology" value="ornithology">
+<label for="ornithology"> Ornithology </label><br>
+<input type="checkbox" id="curator" name="curator" value="curator">
+<label for="curator"> Curator </label><br>
+<input type="checkbox" id="tourguiding" name="tourguiding" value="tourguiding">
+<label for="tourguiding"> Tour (or Safari) Guiding </label><br>
+<input type="checkbox" id="touroperation" name="touroperation" value="touroperation">
+<label for="touroperation"> Tour Operation </label><br>
+<input type="checkbox" id="ecotourismmanagement" name="ecotourismmanagement" value="ecotourismmanagement">
+<label for="ecotourismmanagement"> Ecotourism Management </label><br>
+<input type="checkbox" id="landscaping" name="landscaping" value="landscaping">
+<label for="landscaping"> Landscaping </label><br>
+
+ <label for="hospitality"> B. HOSPITALITY </label><br>
+<input type="checkbox" id="hospitalitymanagement" name="hospitalitymmanagement" value="hospitalitymanagement">
+<label for="hospitalitymanagement"> Hospitality Management </label><br>
+<input type="checkbox" id="eventmanagement" name="eventmanagement" value="eventmanagement">
+<label for="eventmanagement"> Event Management </label><br>
+<input type="checkbox" id="foodandbeverageservice" name="foodandbeverageservice" value="foodandbeverageservice">
+<label for="foodandbeverageservice"> Food & Beverage Service </label><br>
+<input type="checkbox" id="foodandbeverageproduction" name="foodandbeverageproduction" value="foodandbeverageproduction">
+<label for="foodandbeverageproduction"> Ornithology </label><br>
+<input type="checkbox" id="housekeeping" name="housekeeping" value="housekeeping">
+<label for="housekeeping"> House Keeping </label><br>
+<input type="checkbox" id="frontofficemanagement" name="frontofficemanagement" value="frontofficemanagement">
+<label for="frontofficemanagement"> Front Office Management </label><br>
+<input type="checkbox" id="guestrelations" name="guestrelations" value="guestrelations">
+<label for="guestrelations"> Guest Reservations(PR & Customer-care) </label><br>
+<input type="checkbox" id="laundry" name="laundry" value="laundry">
+<label for="laundry"> Laundry and Dry Cleaning Operations </label><br>
+<input type="checkbox" id="maintenance" name="maintenance" value="maintenance">
+<label for="maintenance"> Landscaping </label><br>
+<input type="checkbox" id="wellness" name="wellness" value="wellness">
+<label for="wellness"> Wellness </label><br>
+<input type="checkbox" id="beauty" name="beauty" value="beauty">
+<label for="beauty"> Beauty </label><br>
+<input type="checkbox" id="other" name="other" value="other">
+<label for="other"> OTHER (Please specify) </label><br>
+<input type="text" name="other" placeholder="other">
+
+</form>
+</div>
+<div>
+  <form>
+    <title>
+      Employment Details
+    </title>
+    <p>
+      Nature of employment (Tick where Appropriate)
+    </p>
+    <input type="radio" name="employed" value="employed"> Employed 
+    <input type="radio" name="formal" value="formal"> Formal Employment<br>
+  <input type="radio" name="selfemployed" value="selfemployed"> Self Employed<br><br>
+  <input type="radio" name="unemployed" value="unemployed"> Unemployed<br>
+  <div>
+<p>
+  Current Employment
+</p>
+<label for = "employername"> <b> Name of Employer </b> </label>
+<input type="text" name="employername" placeholder="employername">
+<label for = "employeraddress"> <b> Physical Address </b> </label>
+<input type="text" name="employeraddress" placeholder="employeraddress">
+<label for = "employeremail"> <b> Employer Email </b> </label>
+<input type="text" name="employeremail" placeholder="employeremail">
+<label for = "employertelephone"> <b> Employer Telephone </b> </label>
+<input type="integer" name="employertelephone" placeholder="employertelephone">
+</div>
+<div>
+  <p>
+    Experience in the Industry
+  </p>
+  <label for = "employmentyears"> <b> Years in Employment </b> </label>
+<input type="integer" name="employmentyears" placeholder="employmentyears">
+<label for = "experienceyears"> <b> Years of Practice/Experience </b> </label>
+<input type="integer" name="experienceyears" placeholder="experienceyears">
+</div>
+  </form>
+</div>
+
+</main>
+<p>
+  Filled Forms should be submitted directly to the Authority through its regional offices based in Nairobi, Malindi, Kisumu, Nyeri, Nakuru and Eldoret. The form can also be filled online/mailed via postal address or emailed to TRA address provided below:
+
+  Director General
+  Tourism Regulatory Authority
+  P.O Box 25357 - 00100
+  Nairobi.
+  Email: dg@tourismauthority.go.ke
+</p> 
+</body>
+<button type="submit" name="submit"> SUBMIT </button>
+</div>
+</html>
