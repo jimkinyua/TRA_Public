@@ -11,12 +11,41 @@
       @endif
     </h3>
   --}}
+@if($form->id() == 1021 && $ServiceStatusID != 4 && count($ApplicationStatus) > 0 && $ServiceID == 2033)
+               <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: Your licence needs to be approved for you to continue with this section.
+                </p>
+              </div>
+  @elseif( $form->id() == 21 && $ServiceStatusID != 4 && count($ApplicationStatus) > 0 && $ServiceID = 1033 )
+                        <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: Your licence needs to be approved for you to continue with this section.
+                </p>
+              </div>
 
+
+  @else
+    @if($ApplicationsMade == $ServiceID)
+    <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: You have applied for this licence already.
+                </p>
+              </div>
+      @elseif(count($appdata)==0)
+      <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: You have not applied for any licence yet.
+                </p>
+              </div>
+    @else
   <div class="ui ignored info message">
     <p>
-      The fields marked with * are required
+      The fields marked with * are required 
     </p>
   </div>
+  @endif
+  @endif
 
 
     <form class="ui form"  action="{{ route('submit.application') }}" method="post" enctype="multipart/form-data">
@@ -31,13 +60,14 @@
                 <!-- <input type="text" name="ServiceStatusID" value="{{$ServiceStatusID}}" > -->
                 <!-- $ServicesStatusID = $ServiceStatusID; -->
 
-                @if($ServiceStatusID == 1)
+                @if($ServiceStatusID != 4)
 
                 <div class="ui ignored info message">
                 <p style="color:red;">
                  Please Note: Your licence needs to be approved for you to continue with this section.
                 </p>
               </div>
+
                 @else
                  <div class="ui ignored info message">
                   <p>
@@ -70,7 +100,7 @@
         @else
 
         <div class="required field">
-            <label>Service</label>
+            <label>Service </label>
             <select name="service_id" class="ui dropdown" id="service">
                 {{-- <option value="0"> Select Service </option> --}}
                 <?php $selected = (count($services) == 1) ? "selected='selected'" : "" ?>
@@ -160,7 +190,7 @@
 
  -->
 
-                @if($ServiceStatusID != 4 || count($ApplicationStatus) > 0)
+           <!--      @if($ServiceStatusID != 4 || count($ApplicationStatus) > 0)
 
                 <div class="ui ignored info message">
                 <p style="color:red;">
@@ -178,7 +208,7 @@
                   Your Business Licence is Approved, You Can Make This Application.
                 </p>
               </div>
-                @endif
+                @endif -->
                 <div class="required field">
                 <label>Business Category </label>
                 <div class="ui fitted hidden divider"></div>
@@ -294,7 +324,13 @@
       
 
 
-
+@if($ApplicationsMade == $ServiceID)
+  <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: You have already made this application.
+                </p>
+              </div>
+@else
         <div class="ui section divider"></div>
 
         <div id="searchresults" style="display: none;"> </div>
@@ -308,14 +344,34 @@
                 <p>Submitting False Information Attracts Respective Penalty on the Applicant</p>
             </div>
         </div>
-@if( $form->id() == 21 && $ServiceStatusID != 4 && count($ApplicationStatus) > 0 && $ServiceID = 1033 )
+@if( $form->id() == 21 && $ServiceStatusID != 4 && $ServiceID = 1033 )
                         <div class="ui ignored info message">
                 <p style="color:red;">
                  Please Note: Your licence needs to be approved for you to continue with this section.
                 </p>
               </div>
+@elseif($form->id() == 1021 && $ServiceStatusID != 4  && $ServiceID == 2033)
+               <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: Your licence needs to be approved for you to continue with this section.
+                </p>
+              </div>
+@elseif(count($appdata) == 0 && $ServiceID == 2033))
+        <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: You have not applied for any licence to continue with this application.
+                </p>
+              </div>
+@elseif(count($appdata) == 0 && $ServiceID == 1033) 
+              <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: You have not applied for any licence to continue with this application.
+                </p>
+              </div>
 @else
-        <button id="submit" class="fluid ui positive button">Submit</button>
+        <button id="submit" class="fluid ui positive button">Submit</button> 
+        
+@endif
 @endif
     </form>
 @endsection

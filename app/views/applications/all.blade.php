@@ -9,6 +9,10 @@
       <div class="sub header">You have not yet applied for any service</div>
     </h2>
   </div>
+  
+
+
+
   @else
     <h5 class="ui center aligned header">
       <div class="ui mini orange horizontal statistic">
@@ -45,7 +49,9 @@
             <td>{{$application->ServiceHeaderID}}</td>
             <td>{{$application->ServiceName}}</td>
             <td>{{ \Carbon\Carbon::createFromTimeStamp(strtotime($application->Date))->toFormattedDateString() }}</td>
+
             <td>{{$application->ServiceStatusDisplay}}</td>
+            
           </tr>
         @endforeach
       </tbody>
