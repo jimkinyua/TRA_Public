@@ -1,6 +1,6 @@
 <?php
 
-class AjaxController extends BaseController {
+class AjaxController extends BaseController { //ut
 
     public function getUsers()
     {
