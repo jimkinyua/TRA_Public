@@ -72,6 +72,8 @@ Route::group([], function()
 		Route::get('businesses', ['as'=>'list.businesses','uses'=>'DashboardController@businesses']);
 
 		Route::get('applications', ['as' => 'all.applications', 'uses' => 'ApplicationsController@all']);
+		Route::get('renewals', ['as' => 'allrenewals.applications', 'uses' => 'ApplicationsController@allrenewals']);
+		//
 		Route::get('sbp/{id}', ['as' => 'view.permit', 'uses' => 'ApplicationsController@sbp']);
 		Route::get('application/{id}', ['as' => 'view.application', 'uses' => 'ApplicationsController@show']);
 		Route::get('statement/{lrn}/{plotno}/{authority}/{upn}', ['as' => 'view.statement', 'uses' => 'ApplicationsController@statement']);
@@ -82,7 +84,10 @@ Route::group([], function()
 		Route::get('applicationform/{cat}', [ 'as' => 'application.form', 'uses' => 'DashboardController@applicationform']);
 		Route::get('licences/{cat}', [ 'as' => 'grouped.licences', 'uses' => 'ApplicationsController@licences']);
 		Route::get('renewlicence/{cat}', [ 'as' => 'grouped.renewal', 'uses' => 'ApplicationsController@renewlicence']);
+		Route::get('viewlicence/{cat}', [ 'as' => 'view.licence', 'uses' => 'ApplicationsController@viewlicence']);
+		Route::get('viewrenewal/{cat}', [ 'as' => 'view.renewal', 'uses' => 'ApplicationsController@viewrenewal']);
 
+		//
 		Route::get('registerbusiness', ['as' => 'dashboard.business', 'uses' => 'DashboardController@registerBusiness']);
 		Route::post('registerbusiness',['as'=>'post.add.business','uses'=>'BusinessController@postAddBusiness']);
 		Route::post('addvehicle/{id}',['as'=>'post.add.vehicle','uses'=>'BusinessController@postAddVehicle']);
@@ -93,6 +98,7 @@ Route::group([], function()
 		
 		Route::get('invoicepdf/{hid}', ['as' => 'application.invoicepdf', 'uses' => 'ApplicationsController@invoicepdf']);
 		Route::get('invoices', ['as' => 'application.invoices', 'uses' => 'ApplicationsController@invoices']);
+		Route::get('renewalinvoices', ['as' => 'application.renewalinvoices', 'uses' => 'ApplicationsController@renewalinvoices']);
 		Route::get('receipts/{hid}', ['as' => 'application.receipts', 'uses' => 'ApplicationsController@receipts']);
 
 		Route::get('agent',['as'=>'get.business.agent','uses'=>'BusinessController@getAgent']);

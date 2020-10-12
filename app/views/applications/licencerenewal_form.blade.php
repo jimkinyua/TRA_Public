@@ -18,9 +18,11 @@
     </p>
   </div>
   <?php
-  // echo '<pre>';
-  //   print_r($applications);
-  //   exit;
+            if ($Penalty === true){
+             $LicenceFee = number_format($PenaltyAmountToPay +$StandardRenewalFee, 2) ;
+            }else{
+                  $LicenceFee = $StandardRenewalFee;
+            }
 
   ?>
 
@@ -28,8 +30,10 @@
       <input type="hidden" name="form_id" value="{{$form->id()}}" >
       <input type="hidden" name="PermitNo" value="{{$applications[0]->PermitNo}}" >
       <input type="hidden" name="CategoryNumber" value="{{2}}" >
+      <input type="hidden" name="LicenceFee" value="{{ $LicenceFee}}" >
+      <input type="hidden" name="ServiceHeaderID" value="{{ $ServiceHeaderID}}" >
 
-     
+
 
       @if( $form->id() )
         <div class="ui attached segment">

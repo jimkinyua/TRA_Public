@@ -2,35 +2,62 @@
 
 @section('dashboard-aside')
     <div id="department-menu" class="ui vertical accordion menu" style="width: 100%">
-        <div class="header item">Manage</div>
+        <!-- <div class="header item">Manage</div> -->
 
         <div class="item"> </div>
-        <a class="item" href="{{route('portal.accounts', [ 'cid' => Session::get('customer')->id() ])}}"> Accounts </a>        
+        @if(Session::get('customer')->Type !== 'business')
+        <a class="item" href="{{route('portal.accounts', [ 'cid' => Session::get('customer')->id() ])}}"> My Business Accounts </a>        
+        @else
+        <?php $xxxx = CustomerAgent::where('AgentID', Auth::User()->id())->where('AgentRoleID', 1)->pluck('CustomerID'); ?>
+        <a class="item" href="{{route('switch.account', [ 'cid' => $xxxx ])}}"> Switch to Individual Account </a>        
 
+        @endif
         <div class="item"> </div>
-        <div class="item" id="all-applications"> <a href="{{route('all.applications')}}"> Applications </a> </div>
+        <!-- <div class="item" id="all-applications"> <a href="{{route('all.applications')}}"> Applications </a> </div> -->
 
         
-        @if(Session::get('customer')->Type == 'business')
+        <!-- @if(Session::get('customer')->Type == 'business')
         <div class="item"> </div>
         <a class="item" href="{{route('grouped.licences', [ 'cid' => Session::get('customer')->id() ])}}"> My Licences </a>
         
-        @endif
+        @endif -->
 
         @if(Session::get('customer')->Type == 'business')
             <div class="item" id="permits">
                 <a class="title">
                     <i class="dropdown icon"></i>
-                    Permits
+                    Licence Management
                 </a>
                 <div class="content">
                     <div class="menu">
-                        <a class="item" href="{{route('grouped.applications', 1)}}">My Licences</a>
-                        <a class="item" href="{{route('application.form', 2)}}">Register for Permit</a>
-                        <a class="item" href="{{route('grouped.applications', 1)}}">View Applications</a>
-                        <a class="item" href="{{route('permits.renew')}}">Renew Permit</a>
-                        <?php $cid = Session::get('customer')->id() ?>
-                        <a class="item" href="{{route('permits.view', [ 'cid' => $cid ] )}}"> View Permit</a>
+                         <?php $cid = Session::get('customer')->id() ?>
+
+                        <a class="item" href="{{route('grouped.licences', [ 'cid' => Session::get('customer')->id() ])}}">My Licences</a>
+                        <a class="item" href="{{route('all.applications')}}">My Licence Applications</a>
+                        <a class="item" href="{{route('allrenewals.applications')}}">Licence Renewal Applications</a>
+                        <!-- <a class="item" href="{{route('application.invoices')}}">Licence Renewal Invoices</a>
+                        <a class="item" href="{{route('receipts.view', [ 'cid' => $cid ] )}}">Licence Renewal Receipts</a> -->
+
+                        <!-- <a class="item" href="{{route('permits.view', [ 'cid' => $cid ] )}}"> View Permit</a> -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="item" id="invoice">
+                <a class="title">
+                    <i class="dropdown icon"></i>
+                    Invoice Management Management
+                </a>
+                <div class="content">
+                    <div class="menu">
+                         <?php $cid = Session::get('customer')->id() ?>
+                        <a class="item" href="{{route('application.invoices')}}">Licence Application Invoices</a>
+                        <a class="item" href="{{route('receipts.view', [ 'cid' => $cid ] )}}">Licence Application Receipts</a>
+                        <!-- <a class="item" href="{{route('allrenewals.applications')}}">Licence Renewal Applications</a> -->
+                        <a class="item" href="{{route('application.renewalinvoices')}}">Licence Renewal Invoices</a>
+                        <a class="item" href="{{route('receipts.view', [ 'cid' => $cid ] )}}">Licence Renewal Receipts</a>
+
+                        <!-- <a class="item" href="{{route('permits.view', [ 'cid' => $cid ] )}}"> View Permit</a> -->
                     </div>
                 </div>
             </div>
@@ -49,11 +76,11 @@
             </div>
         @endif
 
-        <div class="item" id="invoices"> <a href="{{route('application.invoices')}}"> Invoices </a> </div>
+        <!-- <div class="item" id="invoices"> <a href="{{route('application.invoices')}}"> Invoices </a> </div> -->
         <?php $cid = Session::get('customer')->id() ?>
-        <a class="item" href="{{route('receipts.view', [ 'cid' => $cid ] )}}"> Receipts </a>
+        <!-- <a class="item" href="{{route('receipts.view', [ 'cid' => $cid ] )}}"> Receipts </a> -->
         <!-- <a class="item" href="{{route('aggregate.payments')}}"> Pay </a> -->
-        <a class="item" href="{{route('get.miscpay')}}"> Miscellaneous Payments </a>
+        <!-- <a class="item" href="{{route('get.miscpay')}}"> Miscellaneous Payments </a> -->
 
     </div>
 @endsection

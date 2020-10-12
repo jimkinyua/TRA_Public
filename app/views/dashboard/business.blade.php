@@ -5,7 +5,7 @@
 
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-        <h3 class="ui dividing header" style="margin-top: 0;">Business Registration</h3>
+        <h3 class="ui dividing header" style="margin-top: 0;">Business Registration Form</h3>
 
         @foreach ($form->sections() as $section )
             @if ($section->Show)
@@ -38,6 +38,57 @@
                 @endif
             @endif
         @endforeach
+
+                          
+        <div class="ui attached segment">
+            <h4 class=" ui dividing header">Attachments  6465 </h4>
+            <table class="ui red table">
+              <thead>
+                  <tr>
+                    <th>Attachment Name</th>
+                    <th>file</th>
+                    {{-- <th>Upload</th> --}}
+                  </tr>
+              </thead>
+               <?php
+
+               // print '<pre>';
+               //  print_r($docs); exit;
+
+                for($i=0;$i<sizeof($docs);$i++)
+                { ?>
+                  <tr>
+                    <td>{{$docs[$i]->DocumentName}}</td>
+                    <td>
+                     
+
+                      <input type="file" id="files[]" name="files[{{$docs[$i]->DocumentID }}]" value="" required />
+
+                    </td>
+                    {{-- <td><button class="ui primary button">Upload</button></td> --}}
+                  </tr>
+                <?php } ?>
+                
+            </table>
+        </div>
+        <div class="ui hidden divider"></div>
+      
+
+
+
+        <div class="ui section divider"></div>
+
+        <div id="searchresults" style="display: none;"> </div>
+
+        <div class="ui icon message">
+            <i class="red warning sign icon"></i>
+            <div class="content">
+                <div class="header">
+                    NOTICE
+                </div>
+                <p>Submitting False Information Attracts Respective Penalty on the Applicant</p>
+            </div>
+        </div>
 
         <div class="ui section divider"></div>
 

@@ -27,9 +27,7 @@
                     <td>{{$service->ServiceID}}</td>
                     <td>{{$service->ServiceName}}</td>
                     @foreach($service->currentCharges as $charge)
-                   
-
-                    
+                     
                         <td>{{number_format($charge->Amount)}}</td>
                     @endforeach
                 </tr>

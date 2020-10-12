@@ -1,55 +1,54 @@
+
 @extends('permits.services')
 
 @section('service')
     <h3 class="ui left aligned dividing  header">  {{$service->ServiceName}}  </h3>
 
-    <form class="ui form"  action="{{ route('update.application') }}" method="post" enctype="multipart/form-data">
+    <!-- <form class="ui form"  action="{{ route('update.application') }}" method="post" enctype="multipart/form-data"> -->
 
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="service_header_id" value="{{$header}}" >
+        <input type="hidden" name="service_id" value="{{$header}}" >
         <input type="hidden" name="CategoryNumber" value="<?= isset($categoryID)?$categoryID:'' ?>" >
         <input type="hidden" name="customer_id" value="{{Session::get('customer')->CustomerID}}" >
+       
+        
+        @if($AllowRenew === true)
+        <p> Your Licence Will Expire in {{$DaysRemainingToRenewalDate}} Days. Please Renew </p>
+        <td> <a href="{{route('grouped.renewal', [ 'ServiceHeaderID' => $header ])}}"> <button> Renew {{$service->ServiceName}} Licence </button> </a>
+
+        @endif
+        
+        
         <?php  ?>
         @if( $form->id() == 2 )
-          <div class="ui attached segment">
-            <div class="required field">
+          <div class="ui attached segment ">
+            <div class="required ">
                 <label>Business Category</label>
-                <div class="ui fitted hidden divider"></div>
-                <textarea cols="50" rows="4" disabled="true">{{$categoryName}}</textarea>
-            </div>
+                <div class="ui fitted hidden divider "></div>
+                    <input type="text" value="{{$categoryName}}" disabled="true"></input>
+          </div>
+          <div class="ui fitted hidden divider "></div>
 
-              {{-- <div class="required field"> --}}
-                  
-                  {{-- <label>Business Category</label> --}}
-                  {{-- <div class="ui fitted hidden divider"></div> --}}
-                  {{-- <select class="ui  dropdown" id="category" onchange="filterActivity()">
-                      <option value="0" > Select Category </option>
-                      @foreach($bill as $index => $group)
-    
-                        @foreach($group->primaryCategories as $cat)
-                       
-                            @if($cat->id() == $CategoryId)
-                              <option value="{{$cat->id()}}" > <strong> {{$cat->ServiceCode}} </strong> {{$cat->CategoryName}} </option>
-                            @endif()
-                          <!-- <option value="{{$cat->id()}}" > {{$cat->CategoryName}} </option> -->
-                          <option value="{{$cat->id()}}" > <strong> {{$cat->ServiceCode}} </strong> {{$cat->CategoryName}} </option>
-                        @endforeach
-                      @endforeach
-                  </select> --}}
-              {{-- </div> --}}
 
-              <div class="required field">
-                  <label>Service Applied</label>
-                  <div class="ui fitted hidden divider"></div>
-                  <select name="service_id" class="ui dropdown" id="service" disabled>
-                  <option value="{{$SavedServiceID}}" selected="true"> {{$SavedServiceName}} </option>
-                      @foreach($services as $service)
-                          <option value="{{$service->ServiceID}}"> <strong> {{$service->ServiceCode}} </strong> {{$service->ServiceName}} </option>
-                      @endforeach
-                  </select>
+              <div class="required">
+                  <label>Licence Name</label>
+                  <div class="ui fitted hidden divider "></div>
+
+                  <input type="text" value="{{$service->ServiceName}}" disabled="true"></input>
               </div>
+              <div class="ui fitted hidden divider "></div>
+
+              <div class="required">
+                  <label>Licence Number</label>
+                  <div class="ui fitted hidden divider "></div>
+
+                  <input type="text" value="{{$LicenceData[0]['PermitNo']}}" disabled="true"></input>
+              </div>
+              <div class="ui fitted hidden divider "></div>
+
               <div class="required field">
                   <label>Applicant</label>
+                  <div class="ui fitted hidden divider "></div>
                   <input type="text" name="customer" value="{{Session::get('customer')->CustomerName}}" disabled>
                   <b> <input type="hidden" name="customer_id" value="{{Session::get('customer')->CustomerID}}" > </b>
               </div>

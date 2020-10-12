@@ -18,13 +18,22 @@ class DashboardController extends Controller {
         ->join('Services','Services.ServiceID','=','ServiceHeader.ServiceID')
         ->join('ServiceStatus','ServiceStatus.ServiceStatusID','=','ServiceHeader.ServiceStatusID')
         ->get();
-
-    //     echo '<pre>';
-    // print_r($bill);
-    // exit;
+        // echo '<pre>';
+        // print_r($bill);
+        // exit;
 
     return View::make('dashboard.home', [ 'applications'=> $data, 'bill' => $bill, ]);
   }
+
+  public function data(Request $request){
+
+    if($request->has('cat_id')){
+        $CountyId = $request->get('cat_id');
+        $data = KenyanSubCounties::where('countyCode',$CountyId)->get();
+        return ['success'=>true,'data'=>$data];
+    }
+
+}
 
   public function accounts($cid) {
     $aid = CustomerAgent::where('CustomerID', $cid)->where('AgentRoleID', 1)->pluck('AgentID');
@@ -285,7 +294,12 @@ class DashboardController extends Controller {
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
     $form = ServiceForm::findOrFail(1);
     $locform = ServiceForm::findOrFail(3);
-    return View::make('dashboard.business', ['bill' => $bill, 'location' => $locform, 'form'=> $form]);
+    $docs=DB::select('select * from vwRequiredDocuments where ServiceCategoryID=2039'); 
+    // ECHO '<PRE>';
+    // print_r($docs);
+    // exit;
+
+    return View::make('dashboard.business', ['bill' => $bill, 'location' => $locform, 'form'=> $form, 'docs'=>$docs]);
   }
 
   public function payment($inv) {

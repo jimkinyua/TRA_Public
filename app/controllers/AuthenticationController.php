@@ -395,39 +395,54 @@ class AuthenticationController extends \BaseController {
     }
 
     public function getChangePassword()  {
+        // exit('Hapa');
         Session::put('change_password_token', csrf_token());
-        #dd(['user__'=>Session::get('user__'),'change_password_token'=>Session::get('change_password_token')]);
+        //dd(['user__'=>Session::get('user__'),'change_password_token'=>Session::get('change_password_token')]);
         $user__ = Session::get('user__');
+        // echo '<pre>';
+        // print_r($user__);
+        // exit;
 
-        //dd($user__);
+        // dd($user__);
         Session::forget('user__');
 
         return View::make('authentication.reset',['user__'=>$user__,'change_password_token'=>Session::get('change_password_token')]);
     }
 
     public function changePassword() {
+        // exit(1);
         $token = Session::get('change_password_token');
+        // echo '<pre>';
+        // print_r($token);
+        // exit;
+
         $rules = array(
             'user__'=>'required|exists:UserProfile,Email',
-            'change_password_token'=>"required|in:$token",
-            'password'=>'required|min:6',
+            // 'change_password_token'=>"required|in:$token",
+            // 'password'=>'required|min:6',
         );
         $messages = array(
             'in' => 'Invalid request token',
         );
 
        
-
         if(Input::get('email')) {
-          $rules = [ 'email' => 'required|exists:UserProfile,Email' ];
-          $messages = [ 'email.exists' => 'Invalid Email Address' ];
+        //                echo '<pre>';
+        // print_r(Input::get('email'));
+        // exit;
+          $rules = [ 'email' => 'required|exists:Agents,Email' ];
+        //   $messages = [ 'email.exists' => 'Invalid Email Address' ];
           $valid = Validator::make(Input::all(),$rules,$messages);
+        //           echo '<pre>';
+        // print_r($valid);
+        // exit;
           if($valid->passes()) 
           {
+            //   exit('hapa');
             Session::put('user__', Input::get('email'));
             Redirect::action('AuthenticationController@getChangePassword');
           }
-
+        //   exit('invalid');
           return Redirect::action('AuthenticationController@getChangePassword')
               ->withErrors($valid);
         }

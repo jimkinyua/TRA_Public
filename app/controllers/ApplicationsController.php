@@ -23,6 +23,32 @@ class ApplicationsController extends Controller {
     return View::make('applications.all', ['applications'=> $data, 'bill' => $bill ]);
   }
 
+  public function allrenewals() 
+  {
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+	 //dd(Session::get('customer'));
+    $data = DB::table('LicenceRenewals')
+      ->select(['LicenceRenewals.ServiceHeaderID',
+            'LicenceRenewals.LicenceNo as No',
+            'LicenceRenewals.LicenceRenewalDate',
+            'Services.ServiceName',
+            'LicenceRenewals.SubmissionDate as Date',
+            'LicenceRenewalStatus.StatusName as ServiceStatusDisplay'])
+      ->where('LicenceRenewals.CustomerID', Session::get('customer')->CustomerID)
+      ->where('LicenceRenewals.Renewed', 1)
+      ->join('Customer','Customer.CustomerID','=','LicenceRenewals.CustomerID')
+      ->join('Services','Services.ServiceID','=','LicenceRenewals.ServiceID')
+      ->join('LicenceRenewalStatus','LicenceRenewalStatus.Id','=','LicenceRenewals.LicenceRenewalStatusId')
+      ->orderBy('LicenceRenewals.SubmissionDate', 'desc')
+      ->get();
+
+      // echo '<pre>';
+      // print_r($data);exit;
+
+	  
+    return View::make('applications.allrenewals', ['applications'=> $data, 'bill' => $bill ]);
+  }
+
   public function licences() //Only Those That Are Damn Approved
   {
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
@@ -83,58 +109,82 @@ class ApplicationsController extends Controller {
       ->orderBy('ServiceHeader.CreatedDate', 'desc')
       ->get();
 
-    
-      
-      //Get the Renewal Form
-      $form = LicenceRenewalForm::findOrFail(2); //2 is For Renewal
-      $docs=DB::select('select * from vwRequiredDocuments where ServiceCategoryID=9'); 
-
-      $StandardRenewalFee = 10000;
-
-
-      //Check If Period is Less than 3 Months
-      $ExpiryDate = $data[0]->ExpiryDate;
-			
-      $TimeToExpiry = ((strtotime($ExpiryDate) - time() ) / (60*60*24));
-      $TimeToExpiry = ceil($TimeToExpiry);
-     
-      $AllowRenew = 0;
-      //Remember to Check if a Liceence can be renewed. A user may be suspended
-
-      //print_r($LicenceRenewal);  exit;
-      // if($TimeToExpiry <= 91 && !$LicenceRenewal){
-        //Check For Penalties
-
-        //Check if the Day they Are Renewing is Past 31st January
-        $DateToday = new DateTime();
-        $day = 31; $month =01; $year = date("Y");
-        $d=mktime(00, 00, 00, $month,$day, $year);
-        $EndOfWaiverDate = date("Y-m-d h:i:sa", $d);
-        //exit($ExpiryDate);
-       
-       if ($DateToday > $EndOfWaiverDate) { // Past The Waiver Date
-           //Calculate Intrest
-           $PenaltyAmountToPay  = $this->CalculateSimpleInterest($StandardRenewalFee, ($TimeToExpiry/30), 10 );
-           $Penalty = true;
-            // exit($PenaltyAmountToPay);
-       }else{//Don't Charge Interest
-        $PenaltyAmountToPay = 0;
-        $Penalty = false;
-       }
-
-      // $PayableAmount =  $PenaltyAmountToPay + $StandardRenewalFee;
-      // print_r($PayableAmount );
+      $ServiceId =DB::table('ServiceHeader')
+      ->select(['ServiceID'])
+      ->where('ServiceHeader.ServiceHeaderID', $ServiceHeaderID)
+      // ->get();
+      ->pluck('ServiceHeader.ServiceID');
+      // print_r($ServiceId);
       // exit;
+      //Check if Licence Renewal Application has been Made
 
+      $Li =DB::table('LicenceRenewals')
+                        ->select(['*'])
+                        ->where('LicenceRenewals.ServiceId', $ServiceId)
+                        ->where('LicenceRenewals.Renewed', 0)
+                        ->get();
+                        // -/>pluck('Amount');
+      if(empty($Li)){
+                  //Get the Renewal Form
+          $form = LicenceRenewalForm::findOrFail(2); //2 is For Renewal
+          $docs=DB::select('select * from vwRequiredDocuments where ServiceCategoryID=9'); 
+          $StandardRenewalFee =DB::table('ServiceCharges')
+                            ->select(['Amount'])
+                            ->where('ServiceCharges.ServiceID', $ServiceId)
+                            // ->get();
+                            ->pluck('Amount');
 
-      // }else{
-        // Session::flash('error_msg','Licences Can Only be renewed with Only 3 Months Remaining');
-        // return Redirect::route('grouped.licences');
-        // return View::make('applications.mylicences', ['applications'=> $data, 'bill' => $bill ]);
+          $ExpiryDate = new DateTime($data[0]->ExpiryDate);
+          $IssuedDate = new DateTime($data[0]->IssuedDate);
+          $currentDate = new DateTime("now");
+          $date = strtotime($data[0]->IssuedDate);
+          $YearLicenceWasIssued = date("Y", $date);
+          
+          $TodayYear = date("Y");
 
-      // }
+          $DaysRemainingToRenewalDate = $ExpiryDate->diff($currentDate)->days;
+          if($DaysRemainingToRenewalDate > 90){
+            $AllowRenew=false;
+            Session::flash('message','Licences are Renewed With 3 Months Remaining to Expirery');
+            return Redirect::route('grouped.licences');
+          }else{
+            $AllowRenew=true;
+          }
+
+          if($YearLicenceWasIssued == $TodayYear){ //Licence Was Isssued This Year. No Interest Charged
+              $PenaltyAmountToPay = 0;
+              $Penalty = false;
+          }else{
+
+            $interval = $currentDate->diff($ExpiryDate); 
+            $MonthsOverdue = $interval->m;
+            $day = 31; $month =01; $year = date("Y");
+            $d=mktime(00, 00, 00, $month,$day, $year);
+            //Get Diffrence in Months Between Day Licence Was issued and Waiver Period End Date
+            $M = date("d-m-Y", $d);
+
+            $EndOfWaiverDate = new DateTime($M);
+            $DiffrenceBetweenEndOfWaiverAndLicenceIssueDate = $ExpiryDate->diff($EndOfWaiverDate)->m;
+            $MonthsOverdue -= $DiffrenceBetweenEndOfWaiverAndLicenceIssueDate;
+
+            $PenaltyAmountToPay  = $this->CalculateSimpleInterest($StandardRenewalFee, $MonthsOverdue, 10 );
+            $Penalty = true;
+          }
+       
+      }else{//Already they Have Made an Application
+
+        Session::flash('message','You Have Already Submitted A Renewal Application for this Licence');
+        return Redirect::route('grouped.licences');
+
+      }
 	  
-    return View::make('applications.licencerenewal_form', ['applications'=> $data, 'bill' => $bill, 'Penalty'=>$Penalty,  'PenaltyAmountToPay'=>$PenaltyAmountToPay, 'StandardRenewalFee'=>$StandardRenewalFee,  'form'=>$form, 'docs'=>$docs ]);
+    return View::make('applications.licencerenewal_form', ['applications'=> $data,
+        'bill' => $bill, 'Penalty'=>$Penalty, 
+        'PenaltyAmountToPay'=>$PenaltyAmountToPay, 
+        'StandardRenewalFee'=>$StandardRenewalFee, 
+        'form'=>$form,
+        'ServiceHeaderID'=>$ServiceHeaderID,
+        'docs'=>$docs ]);
   }
 
   
@@ -144,8 +194,9 @@ class ApplicationsController extends Controller {
     $Interest = 0.0;
 
     //calculate simple interest
-    $Interest = ($principal * $number_of_periods * $interest_rate)/100;
+    $Interest = ($principal * $number_of_periods )*($interest_rate/100);
     $TotalAmountPayable = $Interest + $principal;
+    // exit($number_of_periods);
     //return the value
     return $Interest;
   }
@@ -224,6 +275,95 @@ class ApplicationsController extends Controller {
       'application' => $app, 'form' => $form, 'Status'=>$ApplicationStatus, 'SavedServiceName'=> $SavedServiceName,  'SavedServiceID'=> $SavedServiceID, 'categoryName'=>$categoryName, 'bill' => $bill, 'service' => $service , 'services' => $services, 'header' => $ServiceHeaderID
     ]);
   }
+
+  public function viewlicence($ServiceHeaderID) {
+
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+    $app = FormData::where('ServiceHeaderID', $ServiceHeaderID)->lists('Value', 'FormColumnID');
+  
+    $formID = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->pluck('FormID');
+    $ApplicationStatus = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->pluck('ServiceStatusID');
+    $serviceID = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->pluck('ServiceID');
+    $ServiceCategoryId = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->pluck('ServiceCategoryId');
+    $categoryName = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($ServiceCategoryId))->pluck('CategoryName');
+    $LicenceData = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->get();
+    if(is_null($formID)) {
+      Session::flash('message','Application not found');
+      return Redirect::route('portal.home');
+    }
+    $form = ServiceForm::findOrFail($formID);
+    $service = Service::find($serviceID);
+
+    //Get Diff Between Expirer Date and Today's Date. If Less than 3 Month Don't Allow Renewal
+    $ExpiryDate = new DateTime($LicenceData[0]['ExpiryDate']);
+    $currentDate = new DateTime("now");
+    $DaysRemainingToRenewalDate = $ExpiryDate->diff($currentDate)->days;
+    if($DaysRemainingToRenewalDate > 90){
+      $AllowRenew=true;
+    }else{
+      $AllowRenew=true;
+    }
+
+
+    $services = Service::where('ServiceCategoryID', intval($service->ServiceCategoryID))->get();
+    $SavedServiceName = Service::where('ServiceCategoryID', intval($ServiceCategoryId))->pluck('ServiceName');
+    $SavedServiceID = Service::where('ServiceCategoryID', intval($ServiceCategoryId))->pluck('ServiceID');
+ 
+    // echo '<pre>';
+    // print_r( $app);
+    // exit;
+
+    // //dd($app);
+
+    return View::make('applications.show', [
+      'application' => $app, 'form' => $form, 'AllowRenew'=>$AllowRenew, 'DaysRemainingToRenewalDate'=>$DaysRemainingToRenewalDate, 'LicenceData'=>$LicenceData, 'Status'=>$ApplicationStatus, 'SavedServiceName'=> $SavedServiceName,  'SavedServiceID'=> $SavedServiceID, 'categoryName'=>$categoryName, 'bill' => $bill, 'service' => $service , 'services' => $services, 'header' => $ServiceHeaderID
+    ]);
+  }
+
+  public function viewrenewal($ServiceHeaderID) {
+
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+    $app = FormData::where('ServiceHeaderID', $ServiceHeaderID)->lists('Value', 'FormColumnID');
+      // echo '<pre>';
+      // print_r($app);
+      // exit;
+
+    $formID =2;// ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->pluck('FormID');
+    $ApplicationStatus = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->pluck('ServiceStatusID');
+    $serviceID = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->pluck('ServiceID');
+    $ServiceCategoryId = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->pluck('ServiceCategoryId');
+    $categoryName = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($ServiceCategoryId))->pluck('CategoryName');
+    $LicenceData = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->get();
+    if(is_null($formID)) {
+      Session::flash('message','Application not found');
+      return Redirect::route('portal.home');
+    }
+    $form = ServiceForm::findOrFail($formID);
+    $service = Service::find($serviceID);
+
+    //Get Diff Between Expirer Date and Today's Date. If Less than 3 Month Don't Allow Renewal
+    $ExpiryDate = new DateTime($LicenceData[0]['ExpiryDate']);
+    $currentDate = new DateTime("now");
+    $DaysRemainingToRenewalDate = $ExpiryDate->diff($currentDate)->days;
+    if($DaysRemainingToRenewalDate > 90){
+      $AllowRenew=true;
+    }else{
+      $AllowRenew=true;
+    }
+
+
+    $services = Service::where('ServiceCategoryID', intval($service->ServiceCategoryID))->get();
+    $SavedServiceName = Service::where('ServiceCategoryID', intval($ServiceCategoryId))->pluck('ServiceName');
+    $SavedServiceID = Service::where('ServiceCategoryID', intval($ServiceCategoryId))->pluck('ServiceID');
+ 
+    // //dd($app);
+
+    return View::make('applications.show', [
+      'application' => $app, 'form' => $form, 'AllowRenew'=>$AllowRenew, 'DaysRemainingToRenewalDate'=>$DaysRemainingToRenewalDate, 'LicenceData'=>$LicenceData, 'Status'=>$ApplicationStatus, 'SavedServiceName'=> $SavedServiceName,  'SavedServiceID'=> $SavedServiceID, 'categoryName'=>$categoryName, 'bill' => $bill, 'service' => $service , 'services' => $services, 'header' => $ServiceHeaderID
+    ]);
+  }
+
+  //
 
   public function statement($lrn,$plotno,$authority,$upn) 
   {
@@ -533,6 +673,27 @@ class ApplicationsController extends Controller {
   
       return View::make('applications.invoices', [ 'invoices' => $invoices, 'bill' => $bill ]);
   }
+
+  public function renewalinvoices() 
+  {
+
+
+      $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+
+      $customer_id=Session::get('customer')->CustomerID;
+
+      $apps = LicenceRenewals::where('CustomerID', $customer_id)
+                                ->where('Renewed', 1)
+      ->Select('LicenceId')->get()->toArray();
+      
+      $invoices = LiceneRenewaInvoice::whereIn('LicenceRenewalid',$apps)->orderBy('LicenceRenewalInvoiceHeaderID','desc')->get();
+      // echo '<pre>';
+      // print_r($invoices);
+      // exit;
+
+
+      return View::make('applications.invoices', [ 'invoices' => $invoices, 'bill' => $bill ]);
+  }
   
   public function receipts($hid) {	
 	$bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
@@ -765,10 +926,12 @@ class ApplicationsController extends Controller {
     $LicenceRenewals->SubmissionDate = date('Y-m-d H:i:s');
     $LicenceRenewals->LicenceRenewalStatusId =1; // Input::get('service_id');
     $LicenceRenewals->ServiceId =  Input::get('service_id');
-    // $LicenceRenewals->ServiceCategoryId = Input::get('CategoryNumber');
+    $LicenceRenewals->ServiceHeaderId = Input::get('ServiceHeaderID');
     $LicenceRenewals->ServiceCategoryId =4; //(Input::get('CategoryNumber'))?Input::get('CategoryNumber'):2;
-
     $LicenceRenewals->CustomerID = (Session::get('customer')->CustomerID);
+    $LicenceRenewals->RenewalFee = (int)Input::get('LicenceFee');
+
+
     // $LicenceRenewals->ServiceHeaderType = (is_null($form->ServiceHeaderType) ? 4 : $form->ServiceHeaderType);
     
 

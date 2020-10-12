@@ -64,7 +64,7 @@
             <td>{{  \Carbon\Carbon::createFromTimeStamp(strtotime(@$application->ExpiryDate))->toFormattedDateString() }}</td>
             <td>{{  \Carbon\Carbon::createFromTimeStamp(strtotime(@$application->IssuedDate))->toFormattedDateString() }}</td>
 
-            <td> <a href="{{route('grouped.renewal', [ 'ServiceHeaderID' => $application->ServiceHeaderID ])}}"> <button> Renew Licence </button> </a>
+            <td> <a href="{{route('view.licence', [ 'ServiceHeaderID' => $application->ServiceHeaderID ])}}"> <button> View Licence </button> </a>
             </td>
             {{-- <td>  <button href="{{ route('grouped.renewal',$application->ServiceHeaderID ) }}" type="button" class="btn btn-default btn-success">Renew Licence</button> </td> --}}
             </td>

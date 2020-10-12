@@ -2,8 +2,8 @@
 
 return array(
     'driver'=>'sqlsrv',
-    'server' => 'TRA\SQL2017',
-    'database'=>'TRA',
-    'user'=>'portalman',
+    'server' => 'TRA-EDMS\SQLTRA',
+    'database'=>'TRANEW',
+    'user'=>'sa',
     'password'=>'portalman',
 );
