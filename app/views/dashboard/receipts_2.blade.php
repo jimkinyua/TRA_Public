@@ -32,6 +32,17 @@
       </thead>
       <tbody>
 		<?php //print_r($receipts->InvoiceHeaderID); die(); ?>
+    @if($RenewalReceipt === true)
+        @foreach($receipts as $receipt)	
+            <tr>
+              <td> <a href="{{route('renewalreceipt_2.view', [ 'rid' => $receipt->ReceiptID,'hid' => $InvoiceNo ])}}" > View </a> </td>
+              <td>{{ $receipt->ReceiptID }}</td>             
+              <td>{{ $receipt->CreatedDate }}</td> 
+              <td>{{ $receipt->Amount }}</td>              
+            </tr>
+          
+        @endforeach
+      @else
         @foreach($receipts as $receipt)	
             <tr>
               <td> <a href="{{route('receipt_2.view', [ 'rid' => $receipt->ReceiptID,'hid' => $InvoiceNo ])}}" > View </a> </td>
@@ -41,6 +52,8 @@
             </tr>
           
         @endforeach
+    @endif
+
       </tbody>
     </table>
   @endif

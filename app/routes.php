@@ -35,7 +35,8 @@ Route::group([], function()
 		Route::get('viewreceipt/{ihid}', ['as' => 'receipt.view', 'uses' => 'DashboardController@viewreceipt']);
 		
 		Route::get('viewreceipt_2/{rid}/{hid}', ['as' => 'receipt_2.view', 'uses' => 'DashboardController@viewreceipt_2']);
-		
+		Route::get('viewreceipt_2/{rid}/{hid}', ['as' => 'renewalreceipt_2.view', 'uses' => 'DashboardController@viewrenewalreceipt_2']);
+
 		Route::get('viewreceipts/{cid}', ['as' => 'receipts.view', 'uses' => 'DashboardController@viewreceipts']);
 
 		Route::get('payment/{inv}', ['as' => 'portal.payment', 'uses' => 'DashboardController@payment']);
@@ -95,11 +96,16 @@ Route::group([], function()
 
 		Route::get('invoice/{hid}', ['as' => 'application.invoice', 'uses' => 'ApplicationsController@invoice']);
 		Route::get('viewinvoice/{hid}', ['as' => 'application.viewinvoice', 'uses' => 'ApplicationsController@viewinvoice']);
-		
+		Route::get('renewalinvoice/{hid}', ['as' => 'application.renewalinvoice', 'uses' => 'ApplicationsController@renewalinvoice']);
+
+		//
 		Route::get('invoicepdf/{hid}', ['as' => 'application.invoicepdf', 'uses' => 'ApplicationsController@invoicepdf']);
+		Route::get('licencerenewalinvoicepdf/{hid}', ['as' => 'application.licencerenewalinvoicepdf', 'uses' => 'ApplicationsController@licencerenewalinvoicepdf']);
+
 		Route::get('invoices', ['as' => 'application.invoices', 'uses' => 'ApplicationsController@invoices']);
 		Route::get('renewalinvoices', ['as' => 'application.renewalinvoices', 'uses' => 'ApplicationsController@renewalinvoices']);
 		Route::get('receipts/{hid}', ['as' => 'application.receipts', 'uses' => 'ApplicationsController@receipts']);
+		Route::get('renewalreceipts/{hid}', ['as' => 'application.renewalreceipts', 'uses' => 'ApplicationsController@renewalreceipts']);
 
 		Route::get('agent',['as'=>'get.business.agent','uses'=>'BusinessController@getAgent']);
 		Route::post('agent',['as'=>'post.business.agent','uses'=>'BusinessController@postAgent']);

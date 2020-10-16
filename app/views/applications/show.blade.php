@@ -12,7 +12,7 @@
         <input type="hidden" name="customer_id" value="{{Session::get('customer')->CustomerID}}" >
        
         
-        @if($AllowRenew === true)
+        @if($AllowRenew == true)
         <p> Your Licence Will Expire in {{$DaysRemainingToRenewalDate}} Days. Please Renew </p>
         <td> <a href="{{route('grouped.renewal', [ 'ServiceHeaderID' => $header ])}}"> <button> Renew {{$service->ServiceName}} Licence </button> </a>
 

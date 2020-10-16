@@ -6,28 +6,35 @@ class LiceneRenewaInvoice extends \Eloquent {
     protected $primaryKey = 'LicenceRenewalInvoiceHeaderID';
 
     public $timestamps = false;
-
     public function id() { return $this->LicenceRenewalInvoiceHeaderID; }
     public function business() { return $this->belongsTo('Business','CustomerID'); }
     public function application() { return $this->belongsTo('ServiceHeader','InvoiceHeaderID'); }
     // public function payments() { return $this->hasMany('LicenceRenewalReceipt','LiceneRenewaInvoiceHeader'); }
-    public function items() { return $this->hasMany('LicenceRenewalnvoiceLines','InvoiceHeaderID'); }
-    public function receipts() { return $this->hasMany('LicenceRenewaReceiptLines','LicenceRenewalInvoiceHeaderID'); }
+    public function items() {  return $this->hasMany('LicenceRenewalnvoiceLines','InvoiceHeaderID'); }
+    // public function items() {
+    //     return DB::select('SELECT  [LiceneceRenewalInvoiceLineID]
+    //     ,[InvoiceHeaderID]
+    //     ,[Description]
+    //     ,[Amount]
+    //     FROM [TRANEW].[dbo].[LicenceRenewalnvoiceLines] WHere InvoiceHeaderID ='.$this->LicenceRenewalInvoiceHeaderID);  
+    // }
+
+    public function receipts() { return $this->hasMany('LicenceRenewaReceiptLines','InvoiceHeaderID'); }
 	
     public function verifiedPayments() { return $this->hasMany('LicenceRenewalReceipt','LicenceRenewalInvoiceHeaderID')->where('ReceiptStatusID', 1); }
 
-    public function paid(){	$this->receipts->sum('Amount');
+    public function paid(){	return $this->receipts->sum('Amount');
     }
-    public function total(){ $this->items->sum('Amount');
+    public function total(){ return $this->items->sum('Amount');
     }
-     public function balance(){ $this->total()- $this->paid();
+     public function balance(){ return $this->total()- $this->paid();
     }
-   public function receipted(){$this->receipts->sum('Amount');
+    public function receipted(){ return $this->receipts->sum('Amount');
     }
 
     public function recipient() 
 	{		
-		$sh = InvoiceLine::where('InvoiceHeaderID', $this->id())->first();
+		$sh = LicenceRenewaReceiptLines::where('InvoiceHeaderID', $this->id())->first();
 		if(!is_null($sh)) 
 		{
 			$shid = $sh->ServiceHeaderID;
@@ -41,4 +48,6 @@ class LiceneRenewaInvoice extends \Eloquent {
 		}
 		return $this->business;
     }
+
+
 }

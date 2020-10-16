@@ -466,7 +466,7 @@ class DashboardController extends Controller {
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
       $receipt = Receipt::where('ReceiptID', $rid)->first();
     $invoice = Invoice::where('InvoiceHeaderID',$hid)->first();
-  //dd($hid);
+    //dd($hid);
     if(is_null($receipt)) 
     {
       Session::flash('message', 'Could not find an receipt with that Reference Number');
@@ -518,15 +518,80 @@ class DashboardController extends Controller {
       }
     }
     
-  /* if ($iType=='2')
-  {
-    return View::make('dashboard.receipt_house', [ 'receipt' => $receipt, 'bill' => $bill, 'customer' => Session::get('customer'),'InvoiceNo'=>$hid,'Description'=>$Description,'invoice'=>$invoice,'Servicename'=>$ServiceName,'Balance'=>$Balance]);
-  }else{ */
-    return View::make('dashboard.receipt_2', [ 'receipt' => $receipt, 'bill' => $bill, 'customer' => Session::get('customer'),'InvoiceNo'=>$hid,'Description'=>$Description,'invoice'=>$invoice,'Servicename'=>$ServiceName,'Balance'=>$Balance]);
-  //}
-    
+    /* if ($iType=='2')
+    {
+      return View::make('dashboard.receipt_house', [ 'receipt' => $receipt, 'bill' => $bill, 'customer' => Session::get('customer'),'InvoiceNo'=>$hid,'Description'=>$Description,'invoice'=>$invoice,'Servicename'=>$ServiceName,'Balance'=>$Balance]);
+    }else{ */
+      return View::make('dashboard.receipt_2', [ 'receipt' => $receipt, 'bill' => $bill, 'customer' => Session::get('customer'),'InvoiceNo'=>$hid,'Description'=>$Description,'invoice'=>$invoice,'Servicename'=>$ServiceName,'Balance'=>$Balance]);
+    //}
+      
   }
 
+  public function viewrenewalreceipt_2($rid,$hid) 
+  {
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+    $receipt = LicenceRenewalReceipt::where('LicenceRenewalReceiptID', $rid)->first();
+    $invoice = LiceneRenewaInvoice::where('LicenceRenewalInvoiceHeaderID',$hid)->first();
+    if(is_null($receipt)) 
+    {
+      Session::flash('message', 'Could not find an receipt with that Reference Number');
+      return Redirect::route('portal.home');
+    }
+  
+    $ILine=LicenceRenewalnvoiceLines::where('InvoiceHeaderID',$hid)->first();
+    $Description='';
+    $ServiceName='';
+    if(!is_null($ILine)){
+      $Description=$ILine->Description;
+      $ServiceID=$ILine->ServiceID;   
+    }
+
+    $ServiceName=Service::where('ServiceID',$ServiceID)->pluck('ServiceName');
+    
+    $ServiceName.=$Description;
+    $Description=$ServiceName;
+    $iType='';
+    $InvoiceType=DB::select('select ServiceHeaderType from vwInvoiceType where InvoiceHeaderID='.$hid); 
+    foreach($InvoiceType as $key =>$value)    
+    {
+      $iType=$value->ServiceHeaderType;
+    }
+    $Balance=0;
+    if($iType=='1')//land
+    {
+      $LandDetail=DB::select('select li.upn,l.Balance 
+                  from LandInvoices li join Land l on li.upn=l.upn  
+                  where li.InvoiceHeaderID='.$hid);
+      foreach($LandDetail as $key =>$value)    
+      {     
+        $Balance=$value->Balance;
+      }   
+    }else if($iType=='2')//house
+    {
+      $HouseDetail=DB::select('select hi.EstateID,hi.HouseNumber,tn.Balance,hr.Balance RBalance 
+                  from HouseInvoices hi
+                  join ReceiptLines rl on rl.InvoiceHeaderID=hi.InvoiceHeaderID
+                  join Receipts r on rl.ReceiptID=r.ReceiptID 
+                  join Tenancy tn on hi.HouseNumber=tn.HouseNumber and hi.EstateID=tn.EstateID 
+                  left join HouseReceipts hr on hr.DocumentNo=r.referencenumber and hr.HouseNumber=hi.HouseNumber 
+                  where hi.InvoiceHeaderID='.$hid.' and r.ReceiptID='.$rid);
+      foreach($HouseDetail as $key =>$value)    
+      {
+        $HouseNumber=$value->HouseNumber;
+        $EstateID=$value->EstateID;
+        $Balance=$value->RBalance;
+      }
+    }
+    
+    /* if ($iType=='2')
+    {
+      return View::make('dashboard.receipt_house', [ 'receipt' => $receipt, 'bill' => $bill, 'customer' => Session::get('customer'),'InvoiceNo'=>$hid,'Description'=>$Description,'invoice'=>$invoice,'Servicename'=>$ServiceName,'Balance'=>$Balance]);
+    }else{ */
+      return View::make('dashboard.licence_renewal_receipt_2', [ 'receipt' => $receipt, 'bill' => $bill, 'customer' => Session::get('customer'),'InvoiceNo'=>$hid,'Description'=>$Description,'invoice'=>$invoice,'Servicename'=>$ServiceName,'Balance'=>$Balance]);
+    //}
+      
+  }
+  
   public function viewreceipts($cid) 
   {
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();

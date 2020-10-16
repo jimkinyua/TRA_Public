@@ -143,10 +143,12 @@ class ApplicationsController extends Controller {
           $TodayYear = date("Y");
 
           $DaysRemainingToRenewalDate = $ExpiryDate->diff($currentDate)->days;
+
+
           if($DaysRemainingToRenewalDate > 90){
             $AllowRenew=false;
-            Session::flash('message','Licences are Renewed With 3 Months Remaining to Expirery');
-            return Redirect::route('grouped.licences');
+            // Session::flash('message','Licences are Renewed With 3 Months Remaining to Expirery');
+            // return Redirect::route('grouped.licences');
           }else{
             $AllowRenew=true;
           }
@@ -346,7 +348,7 @@ class ApplicationsController extends Controller {
     $currentDate = new DateTime("now");
     $DaysRemainingToRenewalDate = $ExpiryDate->diff($currentDate)->days;
     if($DaysRemainingToRenewalDate > 90){
-      $AllowRenew=true;
+      $AllowRenew=false;
     }else{
       $AllowRenew=true;
     }
@@ -572,34 +574,73 @@ class ApplicationsController extends Controller {
   }
 
   public function invoice($ihid) {
-	$Details="";
-	$bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
-	$invoice = Invoice::findOrFail($ihid);
+	  $Details="";
+	  $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+	  $invoice = Invoice::findOrFail($ihid);
 		
-	$sg=DB::select('SELECT sg.ServiceGroupID,sc.ServiceCategoryID FROM 
-		InvoiceLines IL 
-		join Services S ON il.ServiceID=s.ServiceID
-		join ServiceCategory sc on s.ServiceCategoryID=sc.ServiceCategoryID
-		join ServiceGroup sg on sc.ServiceGroupID=sg.ServiceGroupID
-		where il.InvoiceHeaderID='.$ihid);
+    $sg=DB::select('SELECT sg.ServiceGroupID,sc.ServiceCategoryID FROM 
+      InvoiceLines IL 
+      join Services S ON il.ServiceID=s.ServiceID
+      join ServiceCategory sc on s.ServiceCategoryID=sc.ServiceCategoryID
+      join ServiceGroup sg on sc.ServiceGroupID=sg.ServiceGroupID
+      where il.InvoiceHeaderID='.$ihid);
 		
-	$sGroup=$sg[0]->ServiceGroupID;
-	$sCategory=$sg[0]->ServiceCategoryID;
+    $sGroup=$sg[0]->ServiceGroupID;
+    $sCategory=$sg[0]->ServiceCategoryID;
 
-	if($sGroup=="20"){
-		$Details=DB::select('select li.InvoiceHeaderID,li.HouseInvoiceID InvoiceLineID,tn.HouseNumber ServiceName,tn.MonthlyRent Amount,
-				dbo.fnMonthName([Month])+\'-\'+convert(nvarchar(20),[year]) [Description]
-				,tn.balance-tn.monthlyrent Arrears
-				from HouseInvoices li
-				left join Tenancy tn on li.HouseNumber=tn.HouseNumber				
-				left join invoicelines il on li.InvoiceHeaderID=il.InvoiceHeaderID
-				left join services s on il.ServiceID=s.ServiceID 
-				where il.InvoiceHeaderID='.$ihid);
-	}else {
-		$Details=DB::select('Select 0 Arrears');
-	}
+    if($sGroup=="20"){
+      $Details=DB::select('select li.InvoiceHeaderID,li.HouseInvoiceID InvoiceLineID,tn.HouseNumber ServiceName,tn.MonthlyRent Amount,
+          dbo.fnMonthName([Month])+\'-\'+convert(nvarchar(20),[year]) [Description]
+          ,tn.balance-tn.monthlyrent Arrears
+          from HouseInvoices li
+          left join Tenancy tn on li.HouseNumber=tn.HouseNumber				
+          left join invoicelines il on li.InvoiceHeaderID=il.InvoiceHeaderID
+          left join services s on il.ServiceID=s.ServiceID 
+          where il.InvoiceHeaderID='.$ihid);
+    }else {
+      $Details=DB::select('Select 0 Arrears');
+    }
 
-	return View::make('applications.invoice', [ 'invoice' => $invoice, 'bill' => $bill, 'customer' => Session::get('customer'),'Details'=>$Details ]);
+	  return View::make('applications.invoice', [ 'invoice' => $invoice, 'bill' => $bill, 'customer' => Session::get('customer'),'Details'=>$Details ]);
+  }
+
+  public function renewalinvoice($ihid) {
+	  $Details="";
+	  $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+	  $invoice = LiceneRenewaInvoice::find($ihid);
+  
+    // echo '<pre>';
+    // print_r($invoice->paid());
+    // exit;
+
+    // $sg=DB::select('SELECT sg.ServiceGroupID,sc.ServiceCategoryID FROM 
+    //   InvoiceLines IL 
+    //   join Services S ON il.ServiceID=s.ServiceID
+    //   join ServiceCategory sc on s.ServiceCategoryID=sc.ServiceCategoryID
+    //   join ServiceGroup sg on sc.ServiceGroupID=sg.ServiceGroupID
+    //   where il.InvoiceHeaderID='.$ihid);
+
+        // echo '<pre>';
+        // print_r($invoice);
+        // exit;
+        
+        // $sGroup=$sg[0]->ServiceGroupID;
+        // $sCategory=$sg[0]->ServiceCategoryID;
+
+      // if($sGroup=="20"){
+      //   $Details=DB::select('select li.InvoiceHeaderID,li.HouseInvoiceID InvoiceLineID,tn.HouseNumber ServiceName,tn.MonthlyRent Amount,
+      //       dbo.fnMonthName([Month])+\'-\'+convert(nvarchar(20),[year]) [Description]
+      //       ,tn.balance-tn.monthlyrent Arrears
+      //       from HouseInvoices li
+      //       left join Tenancy tn on li.HouseNumber=tn.HouseNumber				
+      //       left join invoicelines il on li.InvoiceHeaderID=il.InvoiceHeaderID
+      //       left join services s on il.ServiceID=s.ServiceID 
+      //       where il.InvoiceHeaderID='.$ihid);
+      // }else {
+      $Details=DB::select('Select 0 Arrears');
+    // }
+
+	  return View::make('applications.renewalinvoice', [ 'invoice' => $invoice, 'bill' => $bill, 'customer' => Session::get('customer'),'Details'=>$Details ]);
   }
 
   public function viewinvoice($ihid) {
@@ -610,36 +651,51 @@ class ApplicationsController extends Controller {
   }
 
   public function invoicepdf($ihid) {
-	$bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
-	$invoice = Invoice::findOrFail($ihid);
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+    $invoice = Invoice::findOrFail($ihid);
 
-	$sg=DB::select('SELECT sg.ServiceGroupID,sc.ServiceCategoryID FROM 
-		InvoiceLines IL 
-		join Services S ON il.ServiceID=s.ServiceID
-		join ServiceCategory sc on s.ServiceCategoryID=sc.ServiceCategoryID
-		join ServiceGroup sg on sc.ServiceGroupID=sg.ServiceGroupID
-		where il.InvoiceHeaderID='.$ihid);
+    $sg=DB::select('SELECT sg.ServiceGroupID,sc.ServiceCategoryID FROM 
+      InvoiceLines IL 
+      join Services S ON il.ServiceID=s.ServiceID
+      join ServiceCategory sc on s.ServiceCategoryID=sc.ServiceCategoryID
+      join ServiceGroup sg on sc.ServiceGroupID=sg.ServiceGroupID
+      where il.InvoiceHeaderID='.$ihid);
 
-	$sGroup=$sg[0]->ServiceGroupID;
-	$sCategory=$sg[0]->ServiceCategoryID;
+    $sGroup=$sg[0]->ServiceGroupID;
+    $sCategory=$sg[0]->ServiceCategoryID;
 
-	if($sGroup=="20"){
-		$Details=DB::select('select li.InvoiceHeaderID,li.HouseInvoiceID InvoiceLineID,tn.HouseNumber ServiceName,tn.MonthlyRent Amount,
-				\'Rent For \'+tn.HouseNumber+\' For \'+dbo.fnMonthName([Month])+\'-\'+convert(nvarchar(20),[year]) [Description]
-				,tn.balance-tn.monthlyrent Arrears
-				from HouseInvoices li
-				left join Tenancy tn on li.HouseNumber=tn.HouseNumber				
-				left join invoicelines il on li.InvoiceHeaderID=il.InvoiceHeaderID
-				left join services s on il.ServiceID=s.ServiceID 
-				where il.InvoiceHeaderID='.$ihid);
-	}else {
+    if($sGroup=="20"){
+      $Details=DB::select('select li.InvoiceHeaderID,li.HouseInvoiceID InvoiceLineID,tn.HouseNumber ServiceName,tn.MonthlyRent Amount,
+          \'Rent For \'+tn.HouseNumber+\' For \'+dbo.fnMonthName([Month])+\'-\'+convert(nvarchar(20),[year]) [Description]
+          ,tn.balance-tn.monthlyrent Arrears
+          from HouseInvoices li
+          left join Tenancy tn on li.HouseNumber=tn.HouseNumber				
+          left join invoicelines il on li.InvoiceHeaderID=il.InvoiceHeaderID
+          left join services s on il.ServiceID=s.ServiceID 
+          where il.InvoiceHeaderID='.$ihid);
+    }else {
 		$Details=DB::select('Select 0 Arrears');
-  }
-  // echo '<pre>';
-  // print_r($invoice);
-  // exit;
+    }
+      // echo '<pre>';
+      // print_r($invoice);
+      // exit;
 
       return View::make('applications.invoicepdf', [ 'invoice' => $invoice, 'bill' => $bill, 'customer' => Session::get('customer'),'Details'=>$Details  ]);
+  }
+
+
+  public function licencerenewalinvoicepdf($ihid) {
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+    $invoice = LiceneRenewaInvoice::findOrFail($ihid);
+    // ECHO '<PRE>';
+    // print_r($invoice);
+    // exit;
+
+
+		$Details=DB::select('Select 0 Arrears');
+
+
+    return View::make('applications.licencerenewalinvoicepdf', [ 'invoice' => $invoice, 'bill' => $bill, 'customer' => Session::get('customer'),'Details'=>$Details  ]);
   }
 
   public function sbp($id) {
@@ -667,10 +723,11 @@ class ApplicationsController extends Controller {
 
       $apps = Application::where('CustomerID', $customer_id)->Select('ServiceHeaderID')->get()->toArray();
 
-
-
       $invoices = Invoice::whereIn('ServiceHeaderID',$apps)->orderBy('InvoiceHeaderID','desc')->get();
-  
+
+      echo '<pre>';
+      print_r($invoices);
+      exit;
       return View::make('applications.invoices', [ 'invoices' => $invoices, 'bill' => $bill ]);
   }
 
@@ -692,18 +749,29 @@ class ApplicationsController extends Controller {
       // exit;
 
 
-      return View::make('applications.invoices', [ 'invoices' => $invoices, 'bill' => $bill ]);
+      return View::make('applications.renewalinvoices', [ 'invoices' => $invoices, 'bill' => $bill ]);
   }
   
   public function receipts($hid) {	
-	$bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
-    $Receipts = ReceiptLine::where('InvoiceHeaderID', $hid)->get();
-    $Desc=InvoiceLine::where('InvoiceHeaderID',$hid)->first();
-	if(!is_null($Desc)){
-		$Description=$Desc->Description;
-	}
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+      $Receipts = ReceiptLine::where('InvoiceHeaderID', $hid)->get();
+      $Desc=InvoiceLine::where('InvoiceHeaderID',$hid)->first();
+      if(!is_null($Desc)){
+        $Description=$Desc->Description;
+      }
 
-    return View::make('dashboard.receipts_2', [ 'receipts' => $Receipts, 'bill' => $bill,'InvoiceNo'=>$hid,'Description'=>$Description]);
+      return View::make('dashboard.receipts_2', [ 'receipts' => $Receipts, 'bill' => $bill,'InvoiceNo'=>$hid,'Description'=>$Description]);
+  }
+
+  public function renewalreceipts($hid) {	
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+      $Receipts = LicenceRenewaReceiptLines::where('InvoiceHeaderID', $hid)->get();
+      $Desc=LicenceRenewalnvoiceLines::where('InvoiceHeaderID',$hid)->first();
+      if(!is_null($Desc)){
+        $Description=$Desc->Description;
+      }
+
+      return View::make('dashboard.receipts_2', [ 'receipts' => $Receipts, 'bill' => $bill,'InvoiceNo'=>$hid,'Description'=>$Description, 'RenewalReceipt'=>true]);
   }
 
   protected  function invalid_service()    {
@@ -920,7 +988,6 @@ class ApplicationsController extends Controller {
        }
     //dd($record);
     $LicenceRenewals = new LicenceRenewals();
-  
     $LicenceRenewals->LicenceNo = Input::get('PermitNo');
     $LicenceRenewals->RenewalFormId = Input::get('form_id');
     $LicenceRenewals->SubmissionDate = date('Y-m-d H:i:s');
@@ -930,15 +997,21 @@ class ApplicationsController extends Controller {
     $LicenceRenewals->ServiceCategoryId =4; //(Input::get('CategoryNumber'))?Input::get('CategoryNumber'):2;
     $LicenceRenewals->CustomerID = (Session::get('customer')->CustomerID);
     $LicenceRenewals->RenewalFee = (int)Input::get('LicenceFee');
-
-
     // $LicenceRenewals->ServiceHeaderType = (is_null($form->ServiceHeaderType) ? 4 : $form->ServiceHeaderType);
-    
-
     $LicenceRenewals->save();
 
     $LicenceId = $LicenceRenewals->id();
-    
+    if(Input::get('LateRenewalCharges')){ //Late Payment Detected
+      $Penalties = new Penalties();
+      $Penalties->ServiceHeaderID = Input::get('ServiceHeaderID');
+      $Penalties->Description = 'Late Renewal Charge';
+      $Penalties->CreateDate = date('Y-m-d H:i:s');
+      $Penalties->Amount = Input::get('LateRenewalCharges');
+      $Penalties->save();
+
+    }else{
+      exit('7347');
+    }
 
 
     $info = $this->extractSpecific($input, $CategoryID);
@@ -965,8 +1038,8 @@ class ApplicationsController extends Controller {
 
     //$AppFeeServiceID = DB::table('ServicePlus')->where('ServiceID', $app->ServiceID)->pluck('service_add');
 
-    $InvoiceHeaderID=$this->createInvoice($LicenceRenewals->LicenceId,Input::get('service_id'));
-    Session::flash('message','Application Created successfully. Invoice Number: '.$InvoiceHeaderID.' for Application fee have been Generated. Please therefore proceed to pay to complete your Application');
+    // $InvoiceHeaderID=$this->createInvoice($LicenceRenewals->LicenceId,Input::get('service_id'));
+    Session::flash('message','Application Submitted successfully.');
     return Redirect::route('portal.home');
   }
 

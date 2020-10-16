@@ -80,7 +80,7 @@
                               @if ($Penalty === true)
                               <tr>
                                 <td>Late Renewal Charges</td>
-                                <td> <input type="text"  value={{number_format($PenaltyAmountToPay, 2)}}  readonly /> </td>
+                                <td> <input type="text" name="LateRenewalCharges" value={{number_format($PenaltyAmountToPay, 2)}}  readonly /> </td>
 
                               </tr>
 

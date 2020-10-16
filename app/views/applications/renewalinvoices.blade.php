@@ -35,10 +35,10 @@
                 ?>
 
                 <tr>
-                  <td> <a href="{{route('application.invoice', [ 'id' => $invoice->id() ])}}">{{$invoice->id()}}</a> </td>
+                  <td> <a href="{{route('application.renewalinvoice', [ 'id' => $invoice->id() ])}}">{{$invoice->id()}}</a> </td>
                   <td>{{$invoice->items()->first()->service}}<br>{{$invoice->items()->first()->Description}}</td>
                   <td class="right aligned"><strong>{{ number_format($invoice->balance(), 2) }}</strong></td>
-				  <td> <a href="{{route('application.receipts', [ 'id' => $hid ])}}">Receipts</a> </td>
+				  <td> <a href="{{route('application.renewalreceipts', [ 'id' => $hid ])}}">Receipts</a> </td>
                 </tr>
               @endif
           @endforeach

@@ -9,7 +9,7 @@ class LicenceRenewalReceipt extends  \Eloquent{
   
 	public function id() { return $this->LicenceRenewalReceiptID; }
 	public function business() { return $this->belongsTo('Business','CustomerID'); }
-	public function items() { return $this->hasMany('LicenceRenewaReceiptLines','LicenceRenewalReceiptID'); } 
+	public function items() { return $this->hasMany('LicenceRenewaReceiptLines','ReceiptID'); } 
   
 	protected $fillable = [
 	'ReferenceNumber', 'InvoiceHeaderID', 'Amount','CreatedBy','ReceiptDate','ReceiptMethodID', 'BankID', 'ReceiptStatusID'
