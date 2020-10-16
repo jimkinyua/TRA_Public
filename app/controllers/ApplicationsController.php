@@ -4,10 +4,28 @@ class ApplicationsController extends Controller {
 
   public function all() 
   {
+
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
 	 //dd(Session::get('customer'));
-    $data = DB::table('ServiceHeader')
+$data = DB::table('ServiceHeader')
       ->select(['ServiceHeader.ServiceHeaderID',
+            'ServiceHeader.PermitNo as No',
+            'Services.ServiceName',
+            'ServiceCategory.ServiceCategoryID',
+            'ServiceHeader.CreatedDate as Date',
+            'ServiceStatus.ServiceStatusDisplay'])
+      ->where('ServiceHeader.CustomerID', Session::get('customer')->CustomerID)
+      ->join('Customer','Customer.CustomerID','=','ServiceHeader.CustomerID')
+      ->join('Services','Services.ServiceID','=','ServiceHeader.ServiceID')
+      ->join('ServiceStatus','ServiceStatus.ServiceStatusID','=','ServiceHeader.ServiceStatusID')
+      ->join('ServiceCategory','ServiceCategory.ServiceCategoryID','=','Services.ServiceCategoryID')
+      ->orderBy('ServiceHeader.CreatedDate', 'desc')
+      ->get();
+
+    // print_r($data);exit;
+$ServiceCategoryID = DB::table('ServiceHeader')
+      ->select(['ServiceCategory.ServiceCategoryID',
+            'ServiceHeader.ServiceHeaderID',
             'ServiceHeader.PermitNo as No',
             'Services.ServiceName',
             'ServiceHeader.CreatedDate as Date',
@@ -16,11 +34,12 @@ class ApplicationsController extends Controller {
       ->join('Customer','Customer.CustomerID','=','ServiceHeader.CustomerID')
       ->join('Services','Services.ServiceID','=','ServiceHeader.ServiceID')
       ->join('ServiceStatus','ServiceStatus.ServiceStatusID','=','ServiceHeader.ServiceStatusID')
+      ->join('ServiceCategory','ServiceCategory.ServiceCategoryID','=','Services.ServiceCategoryID')
       ->orderBy('ServiceHeader.CreatedDate', 'desc')
-      ->get();
-
+      ->pluck('ServiceCategoryID');
+// print_r($ServiceCategoryID);exit;
 	  
-    return View::make('applications.all', ['applications'=> $data, 'bill' => $bill ]);
+    return View::make('applications.all', ['applications'=> $data, 'bill' => $bill, 'ServiceCategoryID'=> $ServiceCategoryID ]);
   }
 
   public function allrenewals() 

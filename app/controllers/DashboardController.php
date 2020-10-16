@@ -253,12 +253,46 @@ class DashboardController extends Controller {
       ->join('ServiceStatus','ServiceStatus.ServiceStatusID','=','ServiceHeader.ServiceStatusID')
       ->orderBy('ServiceHeader.CreatedDate', 'desc')
       ->get();
+
+      $ApplicationsMade = DB::table('ServiceHeader')
+      ->select(['Services.ServiceID',
+            'ServiceHeader.ServiceHeaderID',
+            'ServiceHeader.PermitNo as No',
+            'Services.ServiceName',
+            'ServiceHeader.CreatedDate as Date',
+            'ServiceStatus.ServiceStatusDisplay'])
+      ->where('ServiceHeader.CustomerID', Session::get('customer')->CustomerID)
+      ->where('ServiceStatus.ServiceStatusID','!=',4)
+      ->join('Customer','Customer.CustomerID','=','ServiceHeader.CustomerID')
+      ->join('Services','Services.ServiceID','=','ServiceHeader.ServiceID')
+      ->join('ServiceStatus','ServiceStatus.ServiceStatusID','=','ServiceHeader.ServiceStatusID')
+      ->orderBy('ServiceHeader.CreatedDate', 'desc')
+      ->pluck('ServiceID');
+
+      $appdata = DB::table('ServiceHeader')
+      ->select(['ServiceHeader.ServiceHeaderID',
+            'ServiceHeader.PermitNo as No',
+            'Services.ServiceName',
+            'ServiceCategory.ServiceCategoryID',
+            'ServiceHeader.CreatedDate as Date',
+            'ServiceStatus.ServiceStatusDisplay'])
+      ->where('ServiceHeader.CustomerID', Session::get('customer')->CustomerID)
+      ->join('Customer','Customer.CustomerID','=','ServiceHeader.CustomerID')
+      ->join('Services','Services.ServiceID','=','ServiceHeader.ServiceID')
+      ->join('ServiceStatus','ServiceStatus.ServiceStatusID','=','ServiceHeader.ServiceStatusID')
+      ->join('ServiceCategory','ServiceCategory.ServiceCategoryID','=','Services.ServiceCategoryID')
+      ->orderBy('ServiceHeader.CreatedDate', 'desc')
+      ->get();
+
+    
       //->pluck(['ServiceStatusDisplay']);
+
+      // print_r($ApplicationStatus);exit;
 
     $ServiceID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
 
       // echo '<pre>';
-      // print_r($ServiceID);
+      // print_r($ApplicationStatus);
       // exit;
 
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
@@ -266,6 +300,7 @@ class DashboardController extends Controller {
 
     //Get Form Associaed with the Service Category
     $FormID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('FormID');
+
 
     $categoryName = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('CategoryName');
     $categoryID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
@@ -287,7 +322,7 @@ class DashboardController extends Controller {
     $docs=DB::select('select * from vwRequiredDocuments where ServiceCategoryID='.$cat); 
    
 
-    return View::make('applications/form', ['ServiceStatusID' => $ServiceStatusID, 'ServiceStatusDisplay' => $ServiceStatusDisplay, 'bill' => $bill, 'services' => $services, 'form' => $form,'categoryName'=>$categoryName,'ServiceID'=>$ServiceID,'docs'=>$docs, 'categoryID'=>$categoryID, 'ApplicationStatus' => $ApplicationStatus ]);
+    return View::make('applications/form', ['ServiceStatusID' => $ServiceStatusID, 'ServiceStatusDisplay' => $ServiceStatusDisplay, 'bill' => $bill, 'services' => $services, 'form' => $form,'categoryName'=>$categoryName,'ServiceID'=>$ServiceID,'docs'=>$docs, 'categoryID'=>$categoryID, 'ApplicationStatus' => $ApplicationStatus, 'ApplicationsMade' => $ApplicationsMade, 'appdata'=>$appdata]);
   }
 
   public function registerBusiness() {
