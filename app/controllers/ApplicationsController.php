@@ -135,8 +135,8 @@ $ServiceCategoryID = DB::table('ServiceHeader')
       ->pluck('ServiceHeader.ServiceID');
       // print_r($ServiceId);
       // exit;
-      //Check if Licence Renewal Application has been Made
 
+      //Check if Licence Renewal Application has been Made
       $Li =DB::table('LicenceRenewals')
                         ->select(['*'])
                         ->where('LicenceRenewals.ServiceId', $ServiceId)
@@ -156,40 +156,64 @@ $ServiceCategoryID = DB::table('ServiceHeader')
           $ExpiryDate = new DateTime($data[0]->ExpiryDate);
           $IssuedDate = new DateTime($data[0]->IssuedDate);
           $currentDate = new DateTime("now");
+          // $MonthsOverdue = $interval->m;
+          $day = 31; $month =01; $year = date("Y")+1;
+          $d=mktime(00, 00, 00, $month,$day, $year);
+          $M = date("d-m-Y", $d);
+          $EndOfWaiverDate = new DateTime($M);
+          
           $date = strtotime($data[0]->IssuedDate);
           $YearLicenceWasIssued = date("Y", $date);
           
           $TodayYear = date("Y");
+          $DaysRemainingToRenewalDate = $currentDate->diff($EndOfWaiverDate)->days;
 
-          $DaysRemainingToRenewalDate = $ExpiryDate->diff($currentDate)->days;
-
-
-          if($DaysRemainingToRenewalDate > 90){
+          if($DaysRemainingToRenewalDate > 900){
             $AllowRenew=false;
-            // Session::flash('message','Licences are Renewed With 3 Months Remaining to Expirery');
-            // return Redirect::route('grouped.licences');
+            Session::flash('message','Licences are Renewed With 3 Months Remaining to End of Waiver Date');
+            return Redirect::route('grouped.licences');
           }else{
             $AllowRenew=true;
           }
-
           if($YearLicenceWasIssued == $TodayYear){ //Licence Was Isssued This Year. No Interest Charged
               $PenaltyAmountToPay = 0;
               $Penalty = false;
           }else{
+            if($currentDate > $EndOfWaiverDate){ //Past End Of Waiver Date
+              $interval = $currentDate->diff($EndOfWaiverDate); 
+              $DiffrenceBetweenEndOfWaiverAndLicenceExpiryDate = $ExpiryDate->diff($EndOfWaiverDate)->m;
+              $Penalty = true;
+            }else{//Get Diffence Between Expiry Date and Waiver Date
+              $DaysInBetween = $ExpiryDate->diff($EndOfWaiverDate)->days;
+              if($DaysInBetween > 31){
+                $ISPastEndOfWaiver = true;
+                $Penalty = true;
+                $Diff = $ExpiryDate->diff($currentDate);
+                $MonthsPast = (($Diff->y) * 12) + ($Diff->m);
+                // echo '<pre>';
+                // print_r( $Diff);
 
-            $interval = $currentDate->diff($ExpiryDate); 
-            $MonthsOverdue = $interval->m;
-            $day = 31; $month =01; $year = date("Y");
-            $d=mktime(00, 00, 00, $month,$day, $year);
-            //Get Diffrence in Months Between Day Licence Was issued and Waiver Period End Date
-            $M = date("d-m-Y", $d);
+                // print_r( $ExpiryDate);
+                // print_r( $EndOfWaiverDate);
 
-            $EndOfWaiverDate = new DateTime($M);
-            $DiffrenceBetweenEndOfWaiverAndLicenceIssueDate = $ExpiryDate->diff($EndOfWaiverDate)->m;
-            $MonthsOverdue -= $DiffrenceBetweenEndOfWaiverAndLicenceIssueDate;
+                // print_r( $MonthsPast);
+                // exit;
 
-            $PenaltyAmountToPay  = $this->CalculateSimpleInterest($StandardRenewalFee, $MonthsOverdue, 10 );
-            $Penalty = true;
+              }else{
+                $ISPastEndOfWaiver = false;
+                $Penalty = false;
+                $MonthsPast = 0;
+              }
+              $DiffrenceBetweenEndOfWaiverAndLicenceExpiryDate = $MonthsPast;
+              // echo '<pre>';
+              // print_r($ExpiryDate);
+              // print_r($EndOfWaiverDate);
+              // print_r($DiffrenceBetweenEndOfWaiverAndLicenceExpiryDate);
+              // exit;
+
+            }
+         
+            $PenaltyAmountToPay  = $this->CalculateSimpleInterest($StandardRenewalFee, $DiffrenceBetweenEndOfWaiverAndLicenceExpiryDate, 10 );
           }
        
       }else{//Already they Have Made an Application
@@ -213,7 +237,10 @@ $ServiceCategoryID = DB::table('ServiceHeader')
   {
     //variable and initializations
     $Interest = 0.0;
-
+    // $Months = floor(($number_of_periods)/31);
+    // echo '<pre>';
+    // print_r($number_of_periods);
+    // exit;
     //calculate simple interest
     $Interest = ($principal * $number_of_periods )*($interest_rate/100);
     $TotalAmountPayable = $Interest + $principal;
@@ -314,11 +341,29 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     }
     $form = ServiceForm::findOrFail($formID);
     $service = Service::find($serviceID);
-
-    //Get Diff Between Expirer Date and Today's Date. If Less than 3 Month Don't Allow Renewal
+    $currentDate = new DateTime("now");
+    $day = 31; $month =01; $year = date("Y")+1;
+    $d=mktime(00, 00, 00, $month,$day, $year);
+    //Get Diffrence in Months Between Day Licence Was issued and Waiver Period End Date
+    $M = date("d-m-Y", $d);
+    $EndOfWaiverDate = new DateTime($M);
+    //Get diffrence between Epirery Date and End of Waiver in Months.
+    //If greater than 3,They are Late!!!
     $ExpiryDate = new DateTime($LicenceData[0]['ExpiryDate']);
+    $DaysInBetween = $ExpiryDate->diff($EndOfWaiverDate)->days;
+      
+    if($DaysInBetween > 31){
+      $ISPastEndOfWaiver = true;
+      $DaysPast = $DaysInBetween;
+    }else{
+      $ISPastEndOfWaiver = false;
+      $DaysPast = 0;
+    }
+
+    //Renewing Of Licences is Only Allowed 3 months Before End of Year
     $currentDate = new DateTime("now");
     $DaysRemainingToRenewalDate = $ExpiryDate->diff($currentDate)->days;
+
     if($DaysRemainingToRenewalDate > 90){
       $AllowRenew=true;
     }else{
@@ -330,14 +375,21 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     $SavedServiceName = Service::where('ServiceCategoryID', intval($ServiceCategoryId))->pluck('ServiceName');
     $SavedServiceID = Service::where('ServiceCategoryID', intval($ServiceCategoryId))->pluck('ServiceID');
  
-    // echo '<pre>';
-    // print_r( $app);
-    // exit;
+
 
     // //dd($app);
 
     return View::make('applications.show', [
-      'application' => $app, 'form' => $form, 'AllowRenew'=>$AllowRenew, 'DaysRemainingToRenewalDate'=>$DaysRemainingToRenewalDate, 'LicenceData'=>$LicenceData, 'Status'=>$ApplicationStatus, 'SavedServiceName'=> $SavedServiceName,  'SavedServiceID'=> $SavedServiceID, 'categoryName'=>$categoryName, 'bill' => $bill, 'service' => $service , 'services' => $services, 'header' => $ServiceHeaderID
+      'application' => $app, 'form' => $form, 'AllowRenew'=>$AllowRenew, 
+      'DaysRemainingToRenewalDate'=>$DaysRemainingToRenewalDate, 
+      'LicenceData'=>$LicenceData, 'Status'=>$ApplicationStatus, 
+      'SavedServiceName'=> $SavedServiceName,  
+      'SavedServiceID'=> $SavedServiceID, 
+      'categoryName'=>$categoryName, 'bill' => $bill, 
+      'service' => $service , 'services' => $services, 
+      'header' => $ServiceHeaderID,
+      'ISPastEndOfWaiver'=>$ISPastEndOfWaiver,
+      'DaysPast'=>$DaysPast
     ]);
   }
 
@@ -744,9 +796,9 @@ $ServiceCategoryID = DB::table('ServiceHeader')
 
       $invoices = Invoice::whereIn('ServiceHeaderID',$apps)->orderBy('InvoiceHeaderID','desc')->get();
 
-      echo '<pre>';
-      print_r($invoices);
-      exit;
+      // echo '<pre>';
+      // print_r($invoices);
+      // exit;
       return View::make('applications.invoices', [ 'invoices' => $invoices, 'bill' => $bill ]);
   }
 

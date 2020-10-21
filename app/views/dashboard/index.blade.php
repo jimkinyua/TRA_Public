@@ -62,10 +62,11 @@
       <a class="item" id="manage" href="{{route('portal.manage')}}">
         <i class="tasks icon"></i> Dashboard
       </a>
-
-      <a class="item" id="services" href="{{route('portal.home')}}">
+      @if(Session::get('customer')->Type == 'business')
+      <a class="item" id="services" href="{{route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ])}}">
         <i class="tasks icon"></i> Services
       </a>
+      @endif
 
       <a class="item" id="bill" href="{{route('portal.services')}}">
         <i class="tasks icon"></i> Tourism Services and Activities
@@ -82,6 +83,8 @@
       </div>
     </div>
   </div>
+
+  
 
   <div class="four wide column right floated" style="padding: 0;">
     <div class="menu">

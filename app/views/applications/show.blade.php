@@ -5,14 +5,27 @@
     <h3 class="ui left aligned dividing  header">  {{$service->ServiceName}}  </h3>
 
     <!-- <form class="ui form"  action="{{ route('update.application') }}" method="post" enctype="multipart/form-data"> -->
+        <?php
+        // echo '<pre>';
+        // print_r($AllowRenew);
+        // print_r($ISPastEndOfWaiver);
 
+        // exit;
+        
+        ?>
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <input type="hidden" name="service_id" value="{{$header}}" >
         <input type="hidden" name="CategoryNumber" value="<?= isset($categoryID)?$categoryID:'' ?>" >
         <input type="hidden" name="customer_id" value="{{Session::get('customer')->CustomerID}}" >
        
         
-        @if($AllowRenew == true)
+        @if($AllowRenew == true && $ISPastEndOfWaiver == true)
+        <p> Your Licence Expired {{$DaysPast}} Days Ago.  Please Renew </p>
+        <td> <a href="{{route('grouped.renewal', [ 'ServiceHeaderID' => $header ])}}"> <button> Renew {{$service->ServiceName}} Licence </button> </a>
+
+        @endif
+
+        @if($AllowRenew == true && $ISPastEndOfWaiver == false)
         <p> Your Licence Will Expire in {{$DaysRemainingToRenewalDate}} Days. Please Renew </p>
         <td> <a href="{{route('grouped.renewal', [ 'ServiceHeaderID' => $header ])}}"> <button> Renew {{$service->ServiceName}} Licence </button> </a>
 

@@ -49,7 +49,6 @@ class BusinessController extends BaseController{
     }   
 
     public function postAddBusiness() {
-
         $rules = [
             'ColumnID.4176' => 'required|string',
             'ColumnID.4182' => 'required|string',
@@ -86,7 +85,7 @@ class BusinessController extends BaseController{
 
           'ColumnID.4181.required' => 'Business Website Address is required.',
 
-          // 'ColumnID.11203.required' => 'SubCounty is required.',
+          'ColumnID.13283.required' => 'Business is Required',
           // 'ColumnID.11204.required' => 'Ward is required.',
           // 'ColumnID.11202.required' => 'Business Zone is required.',
         ];
@@ -100,6 +99,9 @@ class BusinessController extends BaseController{
             
             //dd(Session::get('customer'));
             $col = Input::get('ColumnID');
+            // echo '<pre>';
+            // print_r($col);
+            // exit;
 
            
 
@@ -118,16 +120,17 @@ class BusinessController extends BaseController{
               'PostalCode' => $col[4178],
               'Mobile1' => $col[12240],
               'Telephone1' => $col[4179],
+              'BusinessTypeID' => $col[13283],
               'CustomerTypeID' => $col[13283],
               //'BusinessZone' => $col[11202],
               'CustomerName' => $col[4176],
               'PostalAddress' => $col[4177],
               'BusinessID' => $col[4184], //Business Permit NO (If the business has a permit)
               'BusinessRegistrationNumber' => $col[12247], //Certificte of Registration/ ID
-			  'PlotNo' => $col[12238],
+			        'PlotNo' => $col[12238],
               'PhysicalAddress' =>$col[12256],
             ]);
-
+            
             // print_r($customer);
             // exit;
 
@@ -159,7 +162,7 @@ class BusinessController extends BaseController{
         // exit;
 
       $rules = [
-            'ColumnID.4176' => 'required|string',
+            // 'ColumnID.4176' => 'required|string',
             'ColumnID.4182' => 'required|string',
             'ColumnID.4184' => 'string',
             'ColumnID.4177' => 'string',
@@ -174,7 +177,7 @@ class BusinessController extends BaseController{
         ];
 
         $msgs = [
-          'ColumnID.4176.required' => 'Business Name is required.',
+          // 'ColumnID.4176.required' => 'Business Name is required.',
           'ColumnID.4176.string' => 'Business Name may only contain letters.',
 
           'ColumnID.4182.required' => 'KRA PIN is required.',
@@ -195,7 +198,7 @@ class BusinessController extends BaseController{
           'ColumnID.4181.required' => 'Business Website Address is required.',
 
           'ColumnID.13283.required' => 'Account Type is required.',
-
+          
   
         ];
 
@@ -204,7 +207,7 @@ class BusinessController extends BaseController{
         if ($valid->passes()){
             $input = Input::all();
 
-            //dd(Session::get('customer'));
+            // dd(Session::get('customer'));
             $col = Input::get('ColumnID');
 
             $agent = Auth::user();
@@ -230,6 +233,8 @@ class BusinessController extends BaseController{
               'PlotNo' => 12238,
               'PhysicalAddress' => 12256,
               'BusinessRegistrationNumber' => 12247,
+              'BusinessTypeID'=>13283
+
             ];
 
             // print_r($cols);
@@ -252,18 +257,17 @@ class BusinessController extends BaseController{
             
             //print_r(Input::all());exit;
             $customer->save();
-
             $customers = DB::table('CustomerAgents')
                 ->where('AgentID', $agent->id())
                 ->join('Customer', 'Customer.CustomerID', '=', 'CustomerAgents.CustomerID')
-                ->get(['Customer.CustomerName', 'Customer.CustomerID', 'Customer.Type']);
+                ->get(['Customer.CustomerName', 'Customer.CustomerID', 'Customer.Type', 'Customer.BusinessTypeID']);
 
             // customers is a list of accounts that the logged in agent can represent
             Session::set('customer', $customer);
             Session::set('customers', $customers);
 
             Session::flash('message','Business account profile updated successfully');
-            return Redirect::route('portal.home');
+            return Redirect::route('portal.home', ['id'=> Session::get('customer')->BusinessTypeID]);
         }
 
         return Redirect::back()->withErrors($valid)->withInput(Input::all());

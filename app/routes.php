@@ -30,7 +30,7 @@ Route::group([], function()
 		Route::get('miscpay', [ 'as' => 'get.miscpay', 'uses' => 'DashboardController@getmiscpay']);
 		Route::post('miscpay', [ 'as' => 'submit.miscpay', 'uses' => 'DashboardController@postmiscpay']);
 
-		Route::get('/', ['as' => 'portal.home', 'uses' => 'DashboardController@home']);
+		Route::get('home/{id}', ['as' => 'portal.home', 'uses' => 'DashboardController@home']);
 		Route::get('viewpermit/{id}', ['as' => 'permits.view', 'uses' => 'DashboardController@viewpermit']);
 		Route::get('viewreceipt/{ihid}', ['as' => 'receipt.view', 'uses' => 'DashboardController@viewreceipt']);
 		
@@ -63,7 +63,7 @@ Route::group([], function()
 		Route::get('businessprofile/{cid}',['as'=>'business.profile','uses'=>'UsersController@businessProfile']);
 		Route::post('businessprofile',['as'=>'update.business.profile','uses'=>'BusinessController@postUpdateBusiness']);
 		# dashboard menu
-		Route::get('home', ['as' => 'portal.home', 'uses' => 'DashboardController@home']);
+		Route::get('home/{id}', ['as' => 'portal.home', 'uses' => 'DashboardController@home']);
 		Route::get('manage', ['as' => 'portal.manage', 'uses' => 'DashboardController@manage']);
 		Route::get('support', ['as' => 'portal.support', 'uses' => 'DashboardController@support']);
 		Route::get('dashboard', ['as' => 'portal.dashboard', 'uses' => 'DashboardController@home']);

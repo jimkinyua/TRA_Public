@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => 'uasingishu@attain-es.com', 'name' => 'TRA TESTS'),
+	'from' => array('address' => 'passdevelopment00@gmail.com', 'name' => 'TRA TESTS'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -93,7 +93,7 @@ return array(
 	|
 	*/
 
-	'password' => 'eukithmboextopaa',
+	'password' => 'cyvkhicsdngecuvf',
 
 	/*
 	|--------------------------------------------------------------------------

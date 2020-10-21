@@ -2,11 +2,13 @@
 
 class DashboardController extends Controller {
 
-  public function home() {
+  public function home($id) {
+    // echo '<pre>';
+    // print_r($id);
+    // exit;
     //return View::make('welcome');
-    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();  //->where('PrimaryService', 1)->get();
-    
-
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->where('ServiceGroupID', $id)->get();
+  
     $data = DB::table('ServiceHeader')
         ->select(['ServiceHeader.ServiceHeaderID',
             'ServiceHeader.PermitNo as No',
@@ -295,7 +297,7 @@ class DashboardController extends Controller {
       // print_r($ApplicationStatus);
       // exit;
 
-    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->where('ServiceGroupID', Session::get('customer')->BusinessTypeID)->get();
     $services = Service::where('ServiceCategoryID', intval($cat))->get();
 
     //Get Form Associaed with the Service Category
@@ -863,6 +865,7 @@ class DashboardController extends Controller {
 
   public function services() {
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+
     return View::make('dashboard.financebill',['bill' => $bill]);
     //return Redirect::route('all.applications');
   }
@@ -935,6 +938,10 @@ class DashboardController extends Controller {
     if($id) {
       $customer = Customer::find($id);
       Session::set('customer', $customer);
+      // echo'<pre>';
+      // print_r(Session::get('customer'));
+      // exit;
+
       $msg = 'You are now logged in as '.$customer;
       Session::flash('message', $msg);
       return Redirect::route('all.applications');

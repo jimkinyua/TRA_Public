@@ -532,7 +532,7 @@ class UsersController extends \BaseController {
     public function businessProfile($cid)    {
         $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
         $customer = Customer::where('CustomerID', intval($cid))->first()->toArray();
-        $form = ServiceForm::findOrFail(3017);
+        $form = ServiceForm::findOrFail(1);
         $fields = [
           'PIN' => 4182,
           'Ward' => 4186,
@@ -540,7 +540,7 @@ class UsersController extends \BaseController {
           'Website' => 4181,
           'SubCounty' => 4185,
           'PostalCode' => 4178,
-          'Mobile1' => 2240,
+          'Mobile1' => 12240,
           'Telephone1' => 4179,
           'BusinessZone' => 4187,
           'CustomerName' => 4176,
@@ -549,7 +549,9 @@ class UsersController extends \BaseController {
           'PlotNo' => 12238,
           'PhysicalAddress' => 12256,
           'BusinessRegistrationNumber' => 12247,
+          'BusinessTypeID'=>13283
         ];
+
 
         $data = $d = [];
         foreach ($fields as $key => $value) {
@@ -557,7 +559,7 @@ class UsersController extends \BaseController {
           else { array_push($data, [ strval($value) => null ]); }
         }
         foreach($data as $k=>$v) { $i = key($v);  $d[$i] = $v[$i]; }
-//dd($d);
+        //dd($d);
         return View::make('auth.businessprofile', ['bill'=>$bill, 'form'=> $form, 'application' => $d ]);
     }
     /**

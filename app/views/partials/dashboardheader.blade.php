@@ -46,9 +46,14 @@
         <i class="tasks icon"></i> Dashboard
       </a>
 
-      <a class="item" id="services" href="{{route('portal.home')}}">
+      @if(Session::get('customer')->Type == 'business')
+      <a class="item" id="services" href="{{route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ])}}">
         <i class="tasks icon"></i> Services
       </a>
+      @endif
+      <!-- <a class="item" id="services" href="{{route('portal.home')}}">
+        <i class="tasks icon"></i> Services
+      </a> -->
 
       <a class="item" id="bill" href="{{route('portal.services')}}">
         <i class="tasks icon"></i>Tourism Services and Activities

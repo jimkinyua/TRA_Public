@@ -172,6 +172,10 @@ class Api {
     {
         $query = str_replace("#ID","0" ,$q);
         $result = DB::select($query);
+        // echo '<pre>';
+        // print_r($result);
+        // exit;
+
         $vars = (array)$result;
         $values[] = [0 => 'select'];
         foreach ($vars as $var){
@@ -200,6 +204,8 @@ class Api {
     public  static function CreateFormField($columnId)
     {
         $col = FormColumns::find($columnId);
+ 
+
         $dataType = $col->dataType;
 
         switch ($dataType){
@@ -247,7 +253,7 @@ class Api {
 
         $col = FormColumns::find($columnId);
         // echo '<pre>';
-        // print_r( $co);
+        // print_r( $columnId);
         // exit;
 
         $dataType = $col->dataType;
