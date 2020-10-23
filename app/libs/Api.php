@@ -252,9 +252,7 @@ class Api {
     {
 
         $col = FormColumns::find($columnId);
-        // echo '<pre>';
-        // print_r( $columnId);
-        // exit;
+        
 
         $dataType = $col->dataType;
         $default = Input::old($col->id()) || $defaultValue;
@@ -288,10 +286,16 @@ class Api {
             case 'Option':
                 $listener = '';
                 if (!$col->FilterColumnID == null && !$col->FilterColumnID == 0) {
-                  //$listener = 'filterSelect(this.value,'.$col->FilterColumnID.')';
+                  $listener = 'filterSelect(this.value,'.$col->FilterColumnID.')';
                 }
-                //if ($col->id() == 11203) { dd($listener); }
+
+                // if ($col->id() == 14345) { dd($listener); }
                 $values = Api::ResultArray($col->Notes);
+                // echo '<pre>';
+                // print_r($listener);
+                // exit;
+                // exit($values);
+
                 $field = Form::select("ColumnID[".$col->id()."]",$values,Input::old($col->id()),['class'=>'ui dropdown', 'id' => $col->id(), 'onChange' => $listener ]);
                 $label = $col;
                 $width = $col->ColumnSize;

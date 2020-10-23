@@ -211,6 +211,17 @@ class DashboardController extends Controller {
 
     }
 
+    
+    // echo '<pre>';
+    // print_r(Session::get('customer')->);
+    // exit;
+
+
+
+    //  echo '<pre>';
+    // print_r($InspectionOfficers);
+    // exit;
+        
         $ServiceStatusID = DB::table('ServiceHeader')
       ->select(['ServiceHeader.ServiceStatusID',
             'ServiceHeader.ServiceHeaderID',
@@ -303,7 +314,6 @@ class DashboardController extends Controller {
     //Get Form Associaed with the Service Category
     $FormID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('FormID');
 
-
     $categoryName = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('CategoryName');
     $categoryID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
 
@@ -324,7 +334,14 @@ class DashboardController extends Controller {
     $docs=DB::select('select * from vwRequiredDocuments where ServiceCategoryID='.$cat); 
    
 
-    return View::make('applications/form', ['ServiceStatusID' => $ServiceStatusID, 'ServiceStatusDisplay' => $ServiceStatusDisplay, 'bill' => $bill, 'services' => $services, 'form' => $form,'categoryName'=>$categoryName,'ServiceID'=>$ServiceID,'docs'=>$docs, 'categoryID'=>$categoryID, 'ApplicationStatus' => $ApplicationStatus, 'ApplicationsMade' => $ApplicationsMade, 'appdata'=>$appdata]);
+    return View::make('applications/form', ['ServiceStatusID' => $ServiceStatusID,
+     'ServiceStatusDisplay' => $ServiceStatusDisplay, 
+     'bill' => $bill, 'services' => $services, 'form' => $form,
+     'categoryName'=>$categoryName,'ServiceID'=>$ServiceID,
+     'docs'=>$docs, 'categoryID'=>$categoryID, 
+     'ApplicationStatus' => $ApplicationStatus, 
+     'ApplicationsMade' => $ApplicationsMade, 
+     'appdata'=>$appdata]);
   }
 
   public function registerBusiness() {

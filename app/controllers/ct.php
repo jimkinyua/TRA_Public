@@ -238,16 +238,15 @@ class DashboardController extends Controller {
 
 
 
-      // echo '<pre>';
-      // print_r($LicenceStatus);
-      // exit;
-
-
 
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
     $services = Service::where('ServiceCategoryID', intval($cat))->get();
 
     $FormID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('FormID');
+    
+   
+
+
     $categoryName = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('CategoryName');
     $categoryID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
 

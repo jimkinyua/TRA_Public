@@ -13,7 +13,10 @@ Route::group([], function()
 	Route::get('activate/{code}', [ 'as'=> 'activate.portal.user', 'uses'=>'AuthenticationController@activate']);
 	Route::get('financebill', ['as' => 'portal.services', 'uses' => 'DashboardController@services']);
 	Route::get('servicecategory/{cat}', ['as' => 'portal.category', 'uses' => 'DashboardController@category']);
+	Route::get('filterselect/{FilterColumnID}/{SelectedID}', ['as' => 'filter.selects', 'uses' => 'ServicesController@filterSelect']);
+	Route::get('getcounties', ['as' => 'filter.getcounties', 'uses' => 'ServicesController@getCounties']);
 
+	
 	Route::get('searchupn/{upn}', ['as' => 'portal.searchupn', 'uses' => 'DashboardController@searchupn']);
 	Route::get('searchland/{lrn}/{pno}/{upn?}', ['as' => 'portal.searchland', 'uses' => 'DashboardController@searchland']);
 	Route::get('searchinvoice/{id}', ['as' => 'portal.searchinvoice', 'uses' => 'DashboardController@searchinvoice']);
@@ -200,7 +203,7 @@ Route::group(['prefix' => 'v1'], function() {
 			Route::get('invoice/{id}/pay',['as'=>'pay.invoice','uses'=>'PaymentController@getPaymentStatus']);
 			Route::any('estate/house',['as'=>'get.houses','uses'=>'ServicesController@fetchEstateHouses']);
 			Route::any('subcounty/wards',['as'=>'get.wards','uses'=>'ServicesController@fetchWards']);
-			Route::any('ui/filter',['as'=>'filter.select','uses'=>'ServicesController@filterSelect']);
+			// Route::any('ui/filter',['as'=>'filter.select','uses'=>'ServicesController@filterSelect']);
 			Route::any('',['as'=>'update','uses'=>'ServicesController@update']);
 		});
 	});

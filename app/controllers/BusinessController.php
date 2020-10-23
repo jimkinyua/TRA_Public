@@ -55,7 +55,7 @@ class BusinessController extends BaseController{
             'ColumnID.4184' => 'string',
             'ColumnID.4177' => 'string',
             'ColumnID.4178' => 'string',
-            'ColumnID.4179' => 'required|string',
+            // 'ColumnID.4179' => 'required|string',
             'ColumnID.4180' => 'required|email',
             'ColumnID.4181' => 'string',
             // 'ColumnID.11203' => 'required|string',
@@ -77,8 +77,8 @@ class BusinessController extends BaseController{
 
           'ColumnID.4178.string' => 'Postal Code may only contain letters.',
 
-          'ColumnID.4179.required' => 'Business Phone Number is required.',
-          'ColumnID.4179.string' => 'Business Phone Number may only contain letters.',
+          // 'ColumnID.4179.required' => 'Business Phone Number is required.',
+          // 'ColumnID.4179.string' => 'Business Phone Number may only contain letters.',
 
           'ColumnID.4180.required' => 'Business Email Address is required.',
           'ColumnID.4180.email' => 'Business Email Address must be a valid email addess.',
@@ -87,8 +87,13 @@ class BusinessController extends BaseController{
 
           'ColumnID.13283.required' => 'Business is Required',
           // 'ColumnID.11204.required' => 'Ward is required.',
-          // 'ColumnID.11202.required' => 'Business Zone is required.',
+          'ColumnID.12256.required' => 'TRA Region Office Close to the Business is required.',
         ];
+
+        // echo '<pre>';
+        // print_r(Input::all());
+        // exit;
+
 
         //dd(Input::all());
 
@@ -119,16 +124,16 @@ class BusinessController extends BaseController{
               'ContactPerson' => $agent,
               'PostalCode' => $col[4178],
               'Mobile1' => $col[12240],
-              'Telephone1' => $col[4179],
+              // 'Telephone1' => $col[4179],
               'BusinessTypeID' => $col[13283],
               'CustomerTypeID' => $col[13283],
-              //'BusinessZone' => $col[11202],
+              'BusinessZone' => $col[12256],
               'CustomerName' => $col[4176],
               'PostalAddress' => $col[4177],
               'BusinessID' => $col[4184], //Business Permit NO (If the business has a permit)
-              'BusinessRegistrationNumber' => $col[12247], //Certificte of Registration/ ID
+              // 'BusinessRegistrationNumber' => $col[12247], //Certificte of Registration/ ID
 			        'PlotNo' => $col[12238],
-              'PhysicalAddress' =>$col[12256],
+              // 'PhysicalAddress' =>$col[12256],
             ]);
             
             // print_r($customer);
@@ -149,7 +154,7 @@ class BusinessController extends BaseController{
             Session::set('customers', $customers);
 
             Session::flash('message','Business registered successfully');
-            return Redirect::route('portal.home');
+            return Redirect::route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ]);
         }
 
         return Redirect::back()->withErrors($valid)->withInput(Input::all());

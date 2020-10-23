@@ -37,55 +37,82 @@
         document.getElementById("output").src = doc.output('datauristring');
       }
 
-      var zones = [{"id":"1","name":"Ainabkoi","wards":[{"id":"01","name":"Kapsoya"},
-      {"id":"02","name":"Kaptagat"},{"id":"03","name":"Ainabkoi-Olare"}]},
-      {"id":"2","name":"Kapseret","wards":[{"id":"04","name":"Kipkenyo"},{"id":"05","name":"Langas"},
-      {"id":"06","name":"Simat-kapsaret"},{"id":"07","name":"Ngeria"},{"id":"08","name":"Megun"}]},
-      {"id":"3","name":"Kesses","wards":[{"id":"09","name":"Race Course"},{"id":"10","name":"Tarakwa"},
-      {"id":"11","name":"Tulwel-Chuiyat"},{"id":"12","name":"Cheptiret-Kipchamo"}]},
-      {"id":"4","name":"Moiben","wards":[{"id":"14","name":"Kimumu"},{"id":"15","name":"Karuna-Moibeki"},
-      {"id":"16","name":"Moiben"},{"id":"17","name":"Sergoit"},{"id":"18","name":"Kapkures"}]},
-      {"id":"5","name":"Soy","wards":[{"id":"19","name":"Kuinet-Kapsuswa"},{"id":"20","name":"Kiplombe"},
-      {"id":"21","name":"Kipsomba"},{"id":"22","name":"Soy"},{"id":"23","name":"Ziwa"},{"id":"30","name":"Segero"},
-      {"id":"31","name":"Mois Bridge"}]},{"id":"6","name":"Turbo","wards":[{"id":"24","name":"Kamagut"},
-      {"id":"25","name":"Huruma"},{"id":"26","name":"Ngenyilel"},{"id":"27","name":"Kapsaos"},{"id":"28","name":"Tapsagoi"}]}];
+  
+        var zones =  $.get('/getcounties/', function(res, status){
+          // console.log(res);
+
+        });
+          
+          // [{"id":"1","name":"Ainabkoi","wards":[{"id":"01","name":"Kapsoya"},
+          // {"id":"02","name":"Kaptagat"},{"id":"03","name":"Ainabkoi-Olare"}]},
+          // {"id":"2","name":"Kapseret","wards":[{"id":"04","name":"Kipkenyo"},{"id":"05","name":"Langas"},
+          // {"id":"06","name":"Simat-kapsaret"},{"id":"07","name":"Ngeria"},{"id":"08","name":"Megun"}]},
+          // {"id":"3","name":"Kesses","wards":[{"id":"09","name":"Race Course"},{"id":"10","name":"Tarakwa"},
+          // {"id":"11","name":"Tulwel-Chuiyat"},{"id":"12","name":"Cheptiret-Kipchamo"}]},
+          // {"id":"4","name":"Moiben","wards":[{"id":"14","name":"Kimumu"},{"id":"15","name":"Karuna-Moibeki"},
+          // {"id":"16","name":"Moiben"},{"id":"17","name":"Sergoit"},{"id":"18","name":"Kapkures"}]},
+          // {"id":"5","name":"Soy","wards":[{"id":"19","name":"Kuinet-Kapsuswa"},{"id":"20","name":"Kiplombe"},
+          // {"id":"21","name":"Kipsomba"},{"id":"22","name":"Soy"},{"id":"23","name":"Ziwa"},{"id":"30","name":"Segero"},
+          // {"id":"31","name":"Mois Bridge"}]},{"id":"6","name":"Turbo","wards":[{"id":"24","name":"Kamagut"},
+          // {"id":"25","name":"Huruma"},{"id":"26","name":"Ngenyilel"},{"id":"27","name":"Kapsaos"},{"id":"28","name":"Tapsagoi"}]}];
 
       var filterSelect = function(id, target){
-        console.log('id', id);
-        console.log('target', target);
+        // console.log('id', id);
+        // console.log('target', target);
+        var FilterColumnID  = target;
 
         if(id == 0 || id == undefined) { return; }
 
         var toAppend = '';
+        
+        $.get('/filterselect/'+FilterColumnID+'/'+id, function(res, status){
+          console.log(res);
+          $("#service").empty();
+          // var data = (array)res.options;
+          
+          res.forEach(function (it) {
+            console.log(it)
+            $('#'+target).append($('<option id="itemId'+ it['SubCountyId'] +'"></option>').attr('value', it['SubCountyName'] ).text(it['SubCountyName'] ));
 
-        var subcounty = zones.filter(function(it) {
-          return it.id == id;
-        })[0];
-
-        if(subcounty == undefined) {
-
-           var wards = [];
-           zones.forEach(function(it) {
-             wards.push(it.wards);
-           });
-           var merged = [].concat.apply([], wards);
-           var ward = merged.filter(function(it) {
-             return it.id == id;
-           })[0];
-           toAppend += '<option value="'+ward.id+'" selected>'+ward.name+'</option>';
-
-        } else {
-
-          subcounty.wards.forEach(function (it) {
-            toAppend += '<option value="'+ (it.id).substr(1) + '" selected>'+ it.name + '</option>';
+            // toAppend += '<option value="'+ (it['SubCountyId']).substr(1) + '" selected>'+ it['SubCountyName'] + '</option>';
             //console.log('ward id:', (it.id).substr(1));
           });
+          // $.each(res, function(key , value) {
+          //   // console.log(value);
+          //   toAppend += '<option value="'+value+ '" selected>'+ key + '</option>';
+          // });
+        });
 
-        }
+        // var subcounty = zones.filter(function(it) {
+        //   return it.id == id;
+        // })[0];
+
+        // if(subcounty == undefined) {
+
+        //    var wards = [];
+        //    zones.forEach(function(it) {
+        //      wards.push(it.wards);
+        //    });
+        //    var merged = [].concat.apply([], wards);
+        //    var ward = merged.filter(function(it) {
+        //      return it.id == id;
+        //    })[0];
+        //    toAppend += '<option value="'+ward.id+'" selected>'+ward.name+'</option>';
+
+        // } else {
+
+        //   subcounty.wards.forEach(function (it) {
+        //     toAppend += '<option value="'+ (it.id).substr(1) + '" selected>'+ it.name + '</option>';
+        //     //console.log('ward id:', (it.id).substr(1));
+        //   });
+
+        // }
 
         var targetEl = "[name='ColumnID[" + target + "]']";
         console.log(targetEl);
         $(targetEl).html(toAppend);
+        console.log(toAppend);
+
         $(targetEl).parent().dropdown('set text', 'select');
       }
 
@@ -106,6 +133,8 @@
         $(".pick_account").click(function(e) {
           window.location.href = $(e.currentTarget).data('url');
         });
+
+
 
       });
 

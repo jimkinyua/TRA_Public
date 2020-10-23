@@ -92,6 +92,8 @@
                 <label>Applicant</label>
                 <input type="text" name="customer" value="{{Session::get('customer')->CustomerName}}" disabled>
                 <input type="hidden" name="customer_id" value="{{Session::get('customer')->CustomerID}}" >
+                <input type="hidden" name="service_id" value="{{$ServiceID}}" >
+
             </div>
         </div>
 
@@ -101,7 +103,8 @@
 
         <div class="required field">
             <label>Service </label>
-            <select name="service_id" class="ui dropdown" id="service">
+            <input type="hidden" name="service_id" value="{{$ServiceID}}" >
+            <select name="service" class="ui dropdown" id="service">
                 {{-- <option value="0"> Select Service </option> --}}
                 <?php $selected = (count($services) == 1) ? "selected='selected'" : "" ?>
                 @foreach($services as $service)
@@ -290,7 +293,7 @@
 
                   
         <div class="ui attached segment">
-            <h4 class=" ui dividing header">Attachments  6465 </h4>
+            <h4 class=" ui dividing header">Attachments  </h4>
             <table class="ui red table">
               <thead>
                   <tr>

@@ -144,14 +144,24 @@ class ServicesController extends BaseController{
       return Response::json($response);
     }
 
-    public function filterSelect() {
+    public function filterSelect($FilterColumnID, $SelectedID) {
 
       $id = Input::get('FilterColumnID');
-      $q = FormColumns::where('FormColumnID', intval($id))->pluck('Notes');
-      $query = str_replace("#ID", Input::get('SelectedID'), $q);
+
+
+      $q = FormColumns::where('FormColumnID', intval($FilterColumnID))->pluck('Notes');
+    
+
+      $query = str_replace("#ID", $SelectedID, $q);
+  
       //dd($query);
       $result = DB::select($query);
+      return Response::json($result);
+      // echo '<pre>';
+      // print_r($result);
+      // exit;
 
+     
       $vars = (array)$result;
       $values[] = [0 => 'select'];
       foreach ($vars as $var){
@@ -177,9 +187,19 @@ class ServicesController extends BaseController{
 
       $response = [ 'code'=>200, 'message'=>'Options found', 'options'=> $vals ];
 
-      return ($response);
+      return $response;
     }
 
+    public function getCounties() {
+
+      // $id = Input::get('FilterColumnID');
+
+      $q = Counties::select(['CountyName', 'CountyId'])->get()->toJson();
+
+
+      return ($q);
+    }
+    //
     public function getApplyForm() {
         $rules = [
             'form'=>'required:exits:Form,FormID',
