@@ -16,7 +16,6 @@ Route::group([], function()
 	Route::get('filterselect/{FilterColumnID}/{SelectedID}', ['as' => 'filter.selects', 'uses' => 'ServicesController@filterSelect']);
 	Route::get('getcounties', ['as' => 'filter.getcounties', 'uses' => 'ServicesController@getCounties']);
 
-	Route::get('/',['as'=>'home','uses'=>'DashboardController@home']);
 
 	Route::get('searchupn/{upn}', ['as' => 'portal.searchupn', 'uses' => 'DashboardController@searchupn']);
 	Route::get('searchland/{lrn}/{pno}/{upn?}', ['as' => 'portal.searchland', 'uses' => 'DashboardController@searchland']);
