@@ -36,8 +36,6 @@ class DashboardController extends Controller {
       ->join('Customer', 'Customer.CustomerID', '=', 'CustomerAgents.CustomerID')
       ->get(['Customer.CustomerName', 'Customer.CustomerID', 'Customer.Mobile1', 'Customer.Email', 'Customer.IDNO', 'Customer.Type']);
 
-      //dd($customers);
-
     return View::make('dashboard.accounts', [ 'customers'=> $customers, 'bill' => $bill, ]);
 
   }
@@ -61,6 +59,7 @@ class DashboardController extends Controller {
 
 
     $aid = CustomerAgent::where('CustomerID', $cid)->where('AgentRoleID', 1)->pluck('AgentID');
+    exit($aid);
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
     $customers = DB::table('CustomerAgents')
       ->where('CustomerAgents.AgentID', $aid)
@@ -767,6 +766,7 @@ class DashboardController extends Controller {
   }
 
   public function businesses() {
+    // exit('omonso');
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
     $customer = Session::get('customer');
     if((CustomerAgent::where('CustomerID',$customer->CustomerID)->first()->AgentRoleID == 1)) {
@@ -778,7 +778,8 @@ class DashboardController extends Controller {
     } else {
       $businesses = [];
     }
-    //dd($businesses);
+    // echo '<pre>';
+    // print_r($businesses);
     return View::make('dashboard.businesses', ['bill' => $bill, 'applications' => $businesses ]);
   }
 
