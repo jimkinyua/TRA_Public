@@ -14,7 +14,8 @@ class Inspections extends \Illuminate\Database\Eloquent\Model{
         return $this->CountyName;
     }
 
-    public function id(){
-        return $this->InspectionID();
-    }
+    // public function id(){
+    //     return $this->InspectionID();
+    // }
+    public function id()   {  return $this->InspectionID;    }
 }

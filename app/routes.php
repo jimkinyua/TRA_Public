@@ -16,7 +16,8 @@ Route::group([], function()
 	Route::get('filterselect/{FilterColumnID}/{SelectedID}', ['as' => 'filter.selects', 'uses' => 'ServicesController@filterSelect']);
 	Route::get('getcounties', ['as' => 'filter.getcounties', 'uses' => 'ServicesController@getCounties']);
 
-	
+	Route::get('/',['as'=>'home','uses'=>'DashboardController@home']);
+
 	Route::get('searchupn/{upn}', ['as' => 'portal.searchupn', 'uses' => 'DashboardController@searchupn']);
 	Route::get('searchland/{lrn}/{pno}/{upn?}', ['as' => 'portal.searchland', 'uses' => 'DashboardController@searchland']);
 	Route::get('searchinvoice/{id}', ['as' => 'portal.searchinvoice', 'uses' => 'DashboardController@searchinvoice']);
@@ -33,7 +34,7 @@ Route::group([], function()
 		Route::get('miscpay', [ 'as' => 'get.miscpay', 'uses' => 'DashboardController@getmiscpay']);
 		Route::post('miscpay', [ 'as' => 'submit.miscpay', 'uses' => 'DashboardController@postmiscpay']);
 
-		Route::get('home/{id}', ['as' => 'portal.home', 'uses' => 'DashboardController@home']);
+		Route::get('home', ['as' => 'portal.home', 'uses' => 'DashboardController@home']);
 		Route::get('viewpermit/{id}', ['as' => 'permits.view', 'uses' => 'DashboardController@viewpermit']);
 		Route::get('viewreceipt/{ihid}', ['as' => 'receipt.view', 'uses' => 'DashboardController@viewreceipt']);
 		
