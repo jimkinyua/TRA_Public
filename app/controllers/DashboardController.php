@@ -206,14 +206,14 @@ class DashboardController extends Controller {
     return json_encode($d);
   }
 
-  public function applicationform($cat) { // For Any Service
+  public function applicationform($cat) { //Category ID as PARAM
     if($cat == 0) {
 
     }
 
     
     // echo '<pre>';
-    // print_r(Session::get('customer')->);
+    // print_r(Session::get('customer'));
     // exit;
 
 
@@ -302,14 +302,10 @@ class DashboardController extends Controller {
 
       // print_r($ApplicationStatus);exit;
 
-    $ServiceID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
-
-      // echo '<pre>';
-      // print_r($ApplicationStatus);
-      // exit;
+    $ServiceCategoryID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
 
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->where('ServiceGroupID', Session::get('customer')->BusinessTypeID)->get();
-    $services = Service::where('ServiceCategoryID', intval($cat))->get();
+    $services = Service::select(['ServiceName', 'ServiceID'])->where('ServiceCategoryID', intval($cat))->get();
 
     //Get Form Associaed with the Service Category
     $FormID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('FormID');
@@ -337,7 +333,7 @@ class DashboardController extends Controller {
     return View::make('applications/form', ['ServiceStatusID' => $ServiceStatusID,
      'ServiceStatusDisplay' => $ServiceStatusDisplay, 
      'bill' => $bill, 'services' => $services, 'form' => $form,
-     'categoryName'=>$categoryName,'ServiceID'=>$ServiceID,
+     'categoryName'=>$categoryName,'ServiceID'=>$ServiceCategoryID,
      'docs'=>$docs, 'categoryID'=>$categoryID, 
      'ApplicationStatus' => $ApplicationStatus, 
      'ApplicationsMade' => $ApplicationsMade, 

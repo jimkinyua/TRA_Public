@@ -43,10 +43,26 @@
                 </div>
             </div>
 
+            @if(Session::get('customer')->BusinessTypeID == 3) <!-- Class C Citizens -->
             <div class="item" id="invoice">
                 <a class="title">
                     <i class="dropdown icon"></i>
-                    Invoice Management Management
+                    Fleet Management
+                </a>
+                <div class="content">
+                    <div class="menu">
+                         <?php $cid = Session::get('customer')->id() ?>
+                        <a class="item" href="{{route('application.invoices')}}">Register Fleet</a>
+                        <a class="item" href="{{route('receipts.view', [ 'cid' => $cid ] )}}">Registered Fleets</a>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <div class="item" id="invoice">
+                <a class="title">
+                    <i class="dropdown icon"></i>
+                    Invoice Management
                 </a>
                 <div class="content">
                     <div class="menu">

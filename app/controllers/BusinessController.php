@@ -90,9 +90,9 @@ class BusinessController extends BaseController{
           'ColumnID.12256.required' => 'TRA Region Office Close to the Business is required.',
         ];
 
-        // echo '<pre>';
-        // print_r(Input::all());
-        // exit;
+        echo '<pre>';
+        print_r(Input::all());
+        exit;
 
 
         //dd(Input::all());
@@ -163,6 +163,7 @@ class BusinessController extends BaseController{
 
     public function postUpdateBusiness() {
 
+        // echo '<pre>';
         // print_r(Input::all());
         // exit;
 
@@ -172,7 +173,7 @@ class BusinessController extends BaseController{
             'ColumnID.4184' => 'string',
             'ColumnID.4177' => 'string',
             'ColumnID.4178' => 'string',
-            'ColumnID.4179' => 'required|string',
+            'ColumnID.12240' => 'required|string',
             'ColumnID.4180' => 'required|email',
             'ColumnID.4181' => 'string',
             'ColumnID.13283' => 'required',
@@ -194,15 +195,15 @@ class BusinessController extends BaseController{
 
           'ColumnID.4178.string' => 'Postal Code may only contain letters.',
 
-          'ColumnID.4179.required' => 'Business Phone Number is required.',
-          'ColumnID.4179.string' => 'Business Phone Number may only contain letters.',
+          'ColumnID.12240.required' => 'Business Phone Number is required.',
+          'ColumnID.12240.string' => 'Business Phone Number may only contain letters.',
 
           'ColumnID.4180.required' => 'Business Email Address is required.',
           'ColumnID.4180.email' => 'Business Email Address may only contain letters.',
 
           'ColumnID.4181.required' => 'Business Website Address is required.',
 
-          'ColumnID.13283.required' => 'Account Type is required.',
+          'ColumnID.13283.required' => 'Business Type is required.',
           
   
         ];

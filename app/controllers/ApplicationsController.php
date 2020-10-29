@@ -486,6 +486,9 @@ $ServiceCategoryID = DB::table('ServiceHeader')
   {     
     // exit('Nding');
 
+    // ECHO '<PRE>';
+    // print_r(Input::all());
+    // exit;
 
     $rules = [ 'service_id' => 'required|exists:Services,ServiceID' ];
     $valid = Validator::make(Input::all(), $rules);
@@ -1216,7 +1219,7 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     //get the application Fee
     $AppFeeServiceID = DB::table('ServicePlus')->where('ServiceID', $app->ServiceID)->pluck('service_add');
     $InvoiceHeaderID=$this->createInvoice($app->ServiceHeaderID,$app->ServiceID);
-    Session::flash('message','Application Created successfully. Invoice Number: '.$InvoiceHeaderID.' '.$Inspections->id().' for Application fee have been Generated. Please therefore proceed to pay to complete your Application');
+    Session::flash('message','Application Submitted successfully.');
     return Redirect::route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ]);
   }
 
@@ -1317,15 +1320,17 @@ $ServiceCategoryID = DB::table('ServiceHeader')
 
         foreach ($files as $key => $file) 
         {
-          // print('<pre>');
-          // print_r($file); exit;
-
+       
           if(!is_null($file))
           {
             $DocumentID=$key;
             $CustomerID=(Session::get('customer')->CustomerID);
             $name = $file->guessClientExtension();
-            $fileName = time().'.'.$file->getClientOriginalExtension();
+            $fileName = $file->getClientOriginalName();//time().'.'.$file->getClientOriginalExtension();
+            $Name = $file->getClientOriginalName();
+              //  print('<pre>');
+              //   print_r($Name); exit;
+
 
             $destination=$destinationPath."/".$DocumentID."/".$CustomerID."/".$appID;
 
@@ -1335,13 +1340,13 @@ $ServiceCategoryID = DB::table('ServiceHeader')
             }
 
             $filePath=$destination."/".$fileName;
-            
-
+          
             $file->move($destination, $fileName);            
             $document = new Attachments();
             $document->ApplicationNo = $appID;
             $document->DocumentID = $DocumentID;
             $document->FilePath=$filePath;
+            $document->AttachmentName=$Name;
             $document->save();                      
           }
         }

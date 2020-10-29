@@ -15,6 +15,6 @@ class Inspections extends \Illuminate\Database\Eloquent\Model{
     }
 
     public function id(){
-        return $this->InspectionID();
+        return $this->InspectionID;
     }
 }

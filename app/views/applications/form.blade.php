@@ -52,81 +52,17 @@
       <input type="hidden" name="form_id" value="{{$form->id()}}" >
       <input type="hidden" name="CategoryNumber" value="{{$categoryID}}" >
 
-
-      @if( $form->id() == 214 )
-        <div class="ui attached segment">
-            <div class="required field">
-                <label>Business Category </label>
-                <!-- <input type="text" name="ServiceStatusID" value="{{$ServiceStatusID}}" > -->
-                <!-- $ServicesStatusID = $ServiceStatusID; -->
-
-                @if($ServiceStatusID != 4)
-
-                <div class="ui ignored info message">
-                <p style="color:red;">
-                 Please Note: Your licence needs to be approved for you to continue with this section.
-                </p>
-              </div>
-
-                @else
-                 <div class="ui ignored info message">
-                  <p>
-                  Your Business Licence is Approved, You Can Make This Application.
-                </p>
-              </div>
-                @endif
-                <div class="ui fitted hidden divider"></div>
-                <textarea cols="50" rows="4" disabled="true">{{$categoryName}}</textarea>
-            </div>
-            <div class="required field">
-                <label>Service Applied</label>
-                <div class="ui fitted hidden divider"></div>
-                <select name="service_id" class="ui dropdown" id="service">
-                    <option value="0"> Select Activity </option>
-                    @foreach($services as $service)
-                        <option value="{{$service->ServiceID}}"> <strong> {{$service->ServiceCode}} </strong> {{$service->ServiceName}} </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="required field">
-                <label>Applicant</label>
-                <input type="text" name="customer" value="{{Session::get('customer')->CustomerName}}" disabled>
-                <input type="hidden" name="customer_id" value="{{Session::get('customer')->CustomerID}}" >
-                <input type="hidden" name="service_id" value="{{$ServiceID}}" >
-
-            </div>
-        </div>
-
-        <div class="ui hidden divider"></div>
-
-        @else
-
         <div class="required field">
-            <label>Service </label>
-            <input type="hidden" name="service_id" value="{{$ServiceID}}" >
-            <select name="service" class="ui dropdown" id="service">
-                {{-- <option value="0"> Select Service </option> --}}
-                <?php $selected = (count($services) == 1) ? "selected='selected'" : "" ?>
-                @foreach($services as $service)
-
-                    <?php $scode=90; ?>
-
-                    <option value="{{$service->ServiceID}}" {{$selected}} > <strong> <?php $scode; ?> </strong> {{$service->ServiceName}} </option>
-                @endforeach
-            </select>
+            <label>Service Applying For</label>
+            <!-- <input type="hidden" name="service_id" value="{{$ServiceID}}" > -->
+            <select name="service_id" class="ui dropdown" id="service_id">
+              <option value="0"> Select Service </option>
+              @foreach($services as $service)
+                  <option value="{{$service->ServiceID}}"> <strong> {{$service->ServiceCode}} </strong> {{$service->ServiceName}} </option>
+              @endforeach
+          </select>
         </div>
-        @endif
 
-        @if( $form->id() == 12 )
-          <div class="ui segment">
-            <div class="field">
-              <div class="ui toggle checkbox">
-                <input type="checkbox" id="previous" tabindex="0" class="hidden">
-                <label> I have previously registered my land with the county </label>
-              </div>
-            </div>
-          </div>
-        @endif
 
 @section('script')
   @parent
@@ -253,8 +189,7 @@
             </select>
         </div>
         @endif -->
-
-
+        hdhd
         @foreach ($form->sections() as $section )
        
             @if ($section->Show && !$section->Optional)
@@ -327,7 +262,7 @@
       
 
 
-@if($ApplicationsMade == $ServiceID)
+@if($ApplicationsMade == 1)
   <div class="ui ignored info message">
                 <p style="color:red;">
                  Please Note: You have already made this application.
