@@ -15,7 +15,7 @@
       <div class="content">
         <div class="menu">
           @foreach($group->primaryCategories as $cat)
-          <?php //ho '<pre>'; print_r( $cat); exit; ?>
+          <?php //echo '<pre>'; print_r( $cat); exit; ?>
 
             <a class="item" href="{{route('application.form', $cat->ServiceCategoryID)}}" data-category-id="{{$cat->ServiceCategoryID}}">
               <strong> {{$cat->ServiceCode}} </strong>   {{$cat->CategoryName}} </a>

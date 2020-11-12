@@ -11,29 +11,46 @@
       @endif
     </h3>
   --}}
-@if($form->id() == 1021 && $ServiceStatusID != 4 && count($ApplicationStatus) > 0 && $ServiceID == 2033)
+@if($theStatus>0 && $ServiceGroupID == 11)
                <div class="ui ignored info message">
                 <p style="color:red;">
                  Please Note: Your licence needs to be approved for you to continue with this section.
                 </p>
               </div>
-  @elseif( $form->id() == 21 && $ServiceStatusID != 4 && count($ApplicationStatus) > 0 && $ServiceID = 1033 )
-                        <div class="ui ignored info message">
+ @elseif($theStatus>0 && $ServiceGroupID == 12)
+               <div class="ui ignored info message">
                 <p style="color:red;">
                  Please Note: Your licence needs to be approved for you to continue with this section.
                 </p>
               </div>
-
-
-  @else
-    @if($ApplicationsMade == $ServiceID)
-    <div class="ui ignored info message">
+ @elseif($appliedService == $ServiceID && $rejectedService != $ServiceID)
+              <div class="ui ignored info message">
                 <p style="color:red;">
                  Please Note: You have applied for this licence already.
                 </p>
               </div>
-      @elseif(count($appdata)==0)
+ @elseif($appliedService == $ServiceID && $rejectedService == $ServiceID)
+              <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: You are applying for a rejected service.
+                </p>
+              </div>
+@elseif($ServiceGroupID == 11 && ($appliedClassification != $ServiceID))
+              <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: You cannot apply for this classification.
+                </p>
+              </div>
+  @else
+    
+      @if(count($appdata)==0 && $ServiceGroupID == 11)
       <div class="ui ignored info message">
+                <p style="color:red;">
+                 Please Note: You have not applied for any licence yet.
+                </p>
+              </div>
+    @elseif(count($appdata)==0 && $ServiceGroupID == 12)
+    <div class="ui ignored info message">
                 <p style="color:red;">
                  Please Note: You have not applied for any licence yet.
                 </p>
@@ -51,6 +68,8 @@
     <form class="ui form"  action="{{ route('submit.application') }}" method="post" enctype="multipart/form-data">
       <input type="hidden" name="form_id" value="{{$form->id()}}" >
       <input type="hidden" name="CategoryNumber" value="{{$categoryID}}" >
+       <input type="hidden" name="service_id" value="{{$ServiceID}}" >
+       <input type="hidden" name="ServiceGroupID" value="{{$ServiceGroupID}}" >
 
         <div class="required field">
             <label>Service Applying For</label>
@@ -226,9 +245,9 @@
             @endif
         @endforeach
 
-                  
+
         <div class="ui attached segment">
-            <h4 class=" ui dividing header">Attachments  </h4>
+            <h4 class=" ui dividing header">Attachments </h4>
             <table class="ui red table">
               <thead>
                   <tr>
@@ -258,10 +277,11 @@
                 
             </table>
         </div>
-        <div class="ui hidden divider"></div>
-      
+        <div class="ui hidden divider"></div
 
 
+<<<<<<< HEAD
+=======
 @if($ApplicationsMade == 1)
   <div class="ui ignored info message">
                 <p style="color:red;">
@@ -269,10 +289,73 @@
                 </p>
               </div>
 @else
+>>>>>>> master
         <div class="ui section divider"></div>
 
         <div id="searchresults" style="display: none;"> </div>
 
+        @if(count($appdata) == 0 && $ServiceGroupID==11)
+        <div class="ui icon message">
+            <i class="red warning sign icon"></i>
+            <div class="content">
+                <div class="header">
+                    NOTICE
+                </div>
+                <p>You need a licence before making this application</p>
+            </div>
+        </div>
+        @elseif($ServiceGroupID == 11 && ($appliedClassification!=$ServiceID))
+        <div class="ui icon message">
+            <i class="red warning sign icon"></i>
+            <div class="content">
+                <div class="header">
+                    NOTICE
+                </div>
+                <p>You cannot apply for this classification with this establishment.</p>
+            </div>
+        </div>
+        @elseif(count($appdata) == 0 && $ServiceGroupID==12)
+        <div class="ui icon message">
+            <i class="red warning sign icon"></i>
+            <div class="content">
+                <div class="header">
+                    NOTICE
+                </div>
+                <p>You need a licence before making this application</p>
+            </div>
+        </div>
+        @elseif($theStatus > 0 && $ServiceGroupID==11)
+        <div class="ui icon message">
+            <i class="red warning sign icon"></i>
+            <div class="content">
+                <div class="header">
+                    NOTICE
+                </div>
+                <p>The licence is not valid</p>
+            </div>
+        </div>
+        @elseif($theStatus > 0 && $ServiceGroupID==12)
+        <div class="ui icon message">
+            <i class="red warning sign icon"></i>
+            <div class="content">
+                <div class="header">
+                    NOTICE
+                </div>
+                <p>The licence is not valid</p>
+            </div>
+        </div> 
+        @elseif($appliedService == $ServiceID && $rejectedService != $ServiceID)
+        <div class="ui icon message">
+            <i class="red warning sign icon"></i>
+            <div class="content">
+                <div class="header">
+                    NOTICE
+                </div>
+                <p>You have applied for this licence already</p>
+            </div>
+        </div>
+  
+        @else
         <div class="ui icon message">
             <i class="red warning sign icon"></i>
             <div class="content">
@@ -282,35 +365,9 @@
                 <p>Submitting False Information Attracts Respective Penalty on the Applicant</p>
             </div>
         </div>
-@if( $form->id() == 21 && $ServiceStatusID != 4 && $ServiceID = 1033 )
-                        <div class="ui ignored info message">
-                <p style="color:red;">
-                 Please Note: Your licence needs to be approved for you to continue with this section.
-                </p>
-              </div>
-@elseif($form->id() == 1021 && $ServiceStatusID != 4  && $ServiceID == 2033)
-               <div class="ui ignored info message">
-                <p style="color:red;">
-                 Please Note: Your licence needs to be approved for you to continue with this section.
-                </p>
-              </div>
-@elseif(count($appdata) == 0 && $ServiceID == 2033))
-        <div class="ui ignored info message">
-                <p style="color:red;">
-                 Please Note: You have not applied for any licence to continue with this application.
-                </p>
-              </div>
-@elseif(count($appdata) == 0 && $ServiceID == 1033) 
-              <div class="ui ignored info message">
-                <p style="color:red;">
-                 Please Note: You have not applied for any licence to continue with this application.
-                </p>
-              </div>
-@else
-        <button id="submit" class="fluid ui positive button">Submit</button> 
-        
-@endif
-@endif
+
+        <button id="submit" class="fluid ui positive button">Submit</button>    
+      @endif
     </form>
 @endsection
 

@@ -9,12 +9,12 @@
       <h5 class="ui left floated header">
         <span class="ui large teal label">
           <i class="pin icon"></i>
-          Business Profile: <?php echo 'True'; ?>
+          Business Profile: <?php echo ''; ?>
             <a href="{{route('business.profile', [ 'cid' => (Session::get('customer')->CustomerID) ])}}" class="header">
               {{Session::get('customer')}}
             </a>
         </span>
-      </h5>
+      </h5> 
 
       <h6 class="ui right floated header">
         <div class="ui  relaxed horizontal divided list">
@@ -76,7 +76,7 @@
         <div class="ui secondary pointing menu" style="border-bottom: none;">
           @if(Session::get('KWS'))
             <div class="item">
-              <a href="{{route('redirect.away')}}" class="ui button" style="border-radius: 0;"> KWS Admin Portal </a>
+              <a href="{{route('redirect.away')}}" class="ui button" style="border-radius: 0;">  Admin Portal </a>
             </div>
           @endif
         </div>
@@ -90,7 +90,7 @@
     <div class="menu">
       <?php $cid = CustomerAgent::where('AgentID', Auth::User()->id())->where('AgentRoleID', 1)->pluck('CustomerID'); ?>
       <div class="item" style="padding-top: 5px; text-align: right; padding-right: 1em;">
-        <a href="{{ route('switch.account', [ 'cid' => $cid ]) }}" > Workspace  </a>
+        <a href="{{ route('switch.account', [ 'cid' => $cid ]) }}" > Change Account  </a>
       </div>
     </div>
   </div>
