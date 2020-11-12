@@ -92,10 +92,15 @@ Route::group([], function()
 		Route::get('viewrenewal/{cat}', [ 'as' => 'view.renewal', 'uses' => 'ApplicationsController@viewrenewal']);
 
 		//
+		Route::get('registerfleet', ['as' => 'dashboard.fleet', 'uses' => 'DashboardController@registerFleet']);
 		Route::get('registerbusiness', ['as' => 'dashboard.business', 'uses' => 'DashboardController@registerBusiness']);
 		Route::post('registerbusiness',['as'=>'post.add.business','uses'=>'BusinessController@postAddBusiness']);
-		Route::post('addvehicle/{id}',['as'=>'post.add.vehicle','uses'=>'BusinessController@postAddVehicle']);
+		Route::post('addvehicle',['as'=>'post.add.fleet','uses'=>'DashboardController@SubmitFleet']);
 		Route::get('viewbusiness/{id}', ['as' => 'dashboard.view.business', 'uses' => 'DashboardController@viewBusiness']);
+		Route::get('addDirectors/{id}', ['as' => 'add.Directors', 'uses' => 'DashboardController@addBusinessDirectors']);
+		Route::post('addDirectors', ['as' => 'post.add.Directors', 'uses' => 'BusinessController@postBusinessDirectors']);
+		Route::post('submitbusiness/{hid}', ['as' => 'application.submitbusiness', 'uses' => 'BusinessController@submitbusiness']);
+
 
 		Route::get('invoice/{hid}', ['as' => 'application.invoice', 'uses' => 'ApplicationsController@invoice']);
 		Route::get('viewinvoice/{hid}', ['as' => 'application.viewinvoice', 'uses' => 'ApplicationsController@viewinvoice']);

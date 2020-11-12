@@ -31,23 +31,7 @@ class BusinessController extends BaseController{
         return View::make('business.new', ['form'=> $form ]);
     }
 
-    public  function  postAddVehicle($id){
-      $col = Input::all();
-
-      $cv=new CustomerVehicle;
-      $cv->CustomerID=$id;
-      $cv->RegNo=Input::get('RegNumber');
-      $cv->BusParkID=Input::get('BusPark');
-      $cv->SittingCapacity=Input::get('sittingcapacity');
-      $cv->Route=Input::get('Route');
-
-      if($cv->save()){
-        Session::flash('message','Vegicle registered successfully');
-            return Redirect::back();
-      }   
-
-    }   
-
+  
     public function postAddBusiness() {
         $rules = [
             'ColumnID.4176' => 'required|string',
@@ -152,17 +136,77 @@ class BusinessController extends BaseController{
 
             // customers is a list of accounts that the logged in agent can represent
             Session::set('customers', $customers);
-
-            Session::flash('message','Business registered successfully');
+            return Redirect::route('add.Directors', [ 'id' => $customer->id() ]);
+            // Session::flash('message','Business registered successfully');
             return Redirect::route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ]);
         }
 
         return Redirect::back()->withErrors($valid)->withInput(Input::all());
     }
 
+    public function postBusinessDirectors(){
+    
+      $rules = [
+          'FirstName' => 'required',
+          'LastName' => 'required',
+          'PinNo' => 'required',
+          'IdNo' => 'required',
+      ];
 
-    public function postUpdateBusiness() {
 
+      $msgs = [
+        'FirstName' => 'Business Name is required.',
+        'LastName' => 'LastName is required.',
+        'PinNod' => 'KRA PIN is required.',
+        'IdNo' => 'IdNo is required.',
+      ];
+
+      // echo '<pre>';
+      // print_r(Input::all());
+      // exit;
+
+
+      //dd(Input::all());
+
+      $valid = Validator::make(Input::all(),$rules, $msgs);
+
+      if ($valid->passes()){
+          $input = Input::all();
+          $agent = Auth::user();
+          //Initialise Directors
+          $Director = new Directors();
+          $Director->FirstName =  $input['FirstName'];
+          $Director->LastName =  $input['LastName'];
+          $Director->KRAPIN =  $input['PinNo'];
+          $Director->IDNO = $input['IdNo'];
+          $Director->CompanyID = $input['CustomerId']; 
+
+          if($Director->save()){
+
+            $CompanyDirectors  = Directors::select(['FirstName', 
+            'LastName', 'KRAPIN', 'IDNO', 'created_at'])
+              ->where('CompanyID',
+                intval($input['CustomerId'])
+            )->get();
+  
+          }
+          
+
+          return Redirect::route('add.Directors', [
+             'id' =>intval($input['CustomerId']),
+             'Directors'=>$CompanyDirectors
+             ]);
+          // Session::flash('message','Business registered successfully');
+          return Redirect::route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ]);
+      }
+
+      return Redirect::back()->withErrors($valid)->withInput(Input::all());
+  }
+
+
+  public function postUpdateBusiness() {
+
+        // echo '<pre>';
         // print_r(Input::all());
         // exit;
 
@@ -172,7 +216,7 @@ class BusinessController extends BaseController{
             'ColumnID.4184' => 'string',
             'ColumnID.4177' => 'string',
             'ColumnID.4178' => 'string',
-            'ColumnID.4179' => 'required|string',
+            'ColumnID.12240' => 'required|string',
             'ColumnID.4180' => 'required|email',
             'ColumnID.4181' => 'string',
             'ColumnID.13283' => 'required',
@@ -194,15 +238,15 @@ class BusinessController extends BaseController{
 
           'ColumnID.4178.string' => 'Postal Code may only contain letters.',
 
-          'ColumnID.4179.required' => 'Business Phone Number is required.',
-          'ColumnID.4179.string' => 'Business Phone Number may only contain letters.',
+          'ColumnID.12240.required' => 'Business Phone Number is required.',
+          'ColumnID.12240.string' => 'Business Phone Number may only contain letters.',
 
           'ColumnID.4180.required' => 'Business Email Address is required.',
           'ColumnID.4180.email' => 'Business Email Address may only contain letters.',
 
           'ColumnID.4181.required' => 'Business Website Address is required.',
 
-          'ColumnID.13283.required' => 'Account Type is required.',
+          'ColumnID.13283.required' => 'Business Type is required.',
           
   
         ];
@@ -289,4 +333,33 @@ class BusinessController extends BaseController{
       Session::flash('error_msg', 'That Record Does not exist');
       return Redirect::route('portal.dashboard');
     }
+
+    public function submitbusiness($id) {
+
+        $Customer = Customer::find($id);
+           //Get Agent ID
+           $record = DB::table('CustomerAgents')->where('CustomerID', $id)
+           ->get([
+             'AgentID'
+             ]);
+             if($record){
+              $AgentId = $record[0]->AgentID;
+
+             }
+      if($Customer) {
+        $Customer->update(['Submitted'=>1]);
+
+       
+          //  echo '<pre>';
+          //  print_r(Session::get('customer')->CustomerID);
+          //  exit;
+
+            Session::flash('message','Business registered successfully');
+            return Redirect::route('portal.accounts', [ 'id' =>  Session::get('customer')->CustomerID ]);
+      }
+      Session::flash('error_msg', 'That Record Does not exist');
+      return Redirect::route('portal.dashboard');
+    }
+
+    
 }

@@ -17,18 +17,37 @@
                 <th colspan="2" class="five wide column center aligned">Charges (KSh.)</th>
             </tr>
             <tr>
-                <th>License Fees</th>
-                {{-- <th>Sub County</th> --}}
+                <th>Service Charge </th>
+                <th>Application Fees</th>
             </tr>
         </thead>
         <tbody>
+           
             @foreach($services as $service)
                 <tr>
                     <td>{{$service->ServiceID}}</td>
                     <td>{{$service->ServiceName}}</td>
+                    <?php
+                       ;
+                    ?>
                     @foreach($service->currentCharges as $charge)
                      
-                        <td>{{number_format($charge->Amount)}}</td>
+                        <td>{{isset($charge->Amount)?
+                        number_format($charge->Amount):'Not Set'
+                        }}</td>
+                        <?php break; ?>
+                        {{-- <td>{{number_format($charge->Applicationcharges)}}</td> --}}
+
+                        
+                    @endforeach
+                    <?php
+                    // echo '<pre>';
+                    // print_r($service->applicationCharges);
+                    // exit;
+                    ?>
+                    @foreach($service->applicationCharges as $charges)
+                   
+                        <td>{{number_format($charges->Amount)}}</td>
                     @endforeach
                 </tr>
             @endforeach

@@ -13,7 +13,7 @@ class Customer extends Model {
     protected $fillable = [
       'Type', 'CustomerName','IDNO', 'ContactPerson', 'Mobile1', 'PIN', 'BusinessID', 'PlotNo',
       'CustomerName', 'Ward', 'Email', 'Website', 'SubCounty', 'BusinessTypeID','ContactPerson',
-      'PostalCode', 'Telephone1', 'BusinessZone', 'PostalAddress', 'BusinessRegistrationNumber', 'PhysicalAddress'
+      'PostalCode', 'Telephone1', 'Submitted', 'BusinessZone', 'PostalAddress', 'BusinessRegistrationNumber', 'PhysicalAddress'
     ];
 
     public function id(){
