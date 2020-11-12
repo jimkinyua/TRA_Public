@@ -64,7 +64,7 @@
       </a>
       @if(Session::get('customer')->Type == 'business')
       <a class="item" id="services" href="{{route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ])}}">
-        <i class="tasks icon"></i> Services
+        <i class="tasks icon"></i> Services 
       </a>
       @endif
 

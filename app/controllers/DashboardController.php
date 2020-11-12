@@ -2,12 +2,16 @@
 
 class DashboardController extends Controller {
 
-  public function home($id) {
+  public function home() {
     // echo '<pre>';
     // print_r($id);
     // exit;
     //return View::make('welcome');
-    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->where('ServiceGroupID', $id)->get();
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])
+    //->where('ServiceGroupID', $id)
+    // ->where('ServiceGroupID', 11)
+    // ->where('ServiceGroupID', 12)
+    ->get();
   
     $data = DB::table('ServiceHeader')
         ->select(['ServiceHeader.ServiceHeaderID',
