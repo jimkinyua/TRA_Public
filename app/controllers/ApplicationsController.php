@@ -486,11 +486,11 @@ $ServiceCategoryID = DB::table('ServiceHeader')
   {     
     // exit('Nding');
 
-
-    $rules = [ 'service_id' => 'required|exists:Services,ServiceID' ];
+    $rules = [ 'service_id' => 'required' ];
     $valid = Validator::make(Input::all(), $rules);
     $cols = Input::get('ColumnID'); //Get dATA
-    
+    // print_r(Input::all());exit;
+
 
     if ($valid->fails()){
       return Redirect::back()->withErrors($valid)->withInput($cols);
@@ -503,9 +503,9 @@ $ServiceCategoryID = DB::table('ServiceHeader')
   //   $rules = [ 'service_id' => 'required|exists:Services,ServiceID' ];
   //   $valid = Validator::make(Input::all(), $rules);
   //   $cols = Input::get('ColumnID'); //Get dATA
-  //   // echo '<pre>';
-  //   // print_r(Input::all());
-  //   // exit;
+    // echo '<pre>';
+    // print_r(Input::all());
+    // exit;
 
   //   if ($valid->fails()){
   //     return Redirect::back()->withErrors($valid)->withInput($cols);
@@ -1114,7 +1114,10 @@ $ServiceCategoryID = DB::table('ServiceHeader')
   protected function persistApplication($input) {
     
     $msgs = $rules = [];
-    
+    //  echo '<pre>';
+    // print_r(Input::all() );
+    // exit;
+
     $CategoryID = Service::find(intval(Input::get('service_id')))->category()->first()->id();
     
 
@@ -1124,8 +1127,8 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     // $cat = $service->ServiceCategoryID;
  
 
-    $formID = DB::table('ServiceCategory')->where('ServiceCategoryID', $CategoryID)->pluck('FormID');
-
+    $formID = DB::table('ServiceCategory')->where('ServiceCategoryID', Input::get('CategoryNumber'))->pluck('FormID');
+// exit($formID);
     $form = ServiceForm::findOrFail($formID);
     foreach($form->sections() as $section){
       foreach($section->columns() as $field) {
@@ -1160,7 +1163,9 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     $app->CustomerID = (Session::get('customer')->CustomerID);
     $app->ServiceHeaderType = (is_null($form->ServiceHeaderType) ? 4 : $form->ServiceHeaderType);
     
-
+// echo '<pre>';
+//     print_r($app);
+//     exit;
     $app->save();
 
     $HeaderId = $app->id();
