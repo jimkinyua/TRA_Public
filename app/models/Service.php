@@ -24,11 +24,37 @@ class Service extends \Illuminate\Database\Eloquent\Model {
     public function charges() {
         return $this->hasMany('ServiceCharge', 'ServiceID');
     }
+    public function SerivicePlus() {
+        return $this->hasMany('ServicePlus', 'ServiceID');
+    }
+
+    public function applicationCharges() {
+        //    return  DB::table('ServicePlus')
+        //     ->where('ServiceID', $this->id())
+        //     ->pluck('Amount');
+
+        // "select sp.ServicePlusID,sp.ServiceID 
+        // AppliedServiceID,
+        // sp.Amount,s2.ServiceID,s2.ServiceName 
+        // from ServicePlus sp, services s,
+        //  services s2
+        // where sp.ServiceID=s.ServiceID and 
+        // sp.service_add=s2.ServiceID and sp.ServiceID=$exParam"
+        return $this->SerivicePlus()
+            ->where('ServiceID', $this->id());
+            // ->where('service_add', $this->id());
+        // return $this->receipts->sum('Amount');
+    }
 
     public function currentCharges() {
         $currentYear = DB::table('FinancialYear')->where('isCurrentYear', 1)->pluck('FinancialYearId');
         return $this->charges()->where('FinancialYearId', $currentYear);
     }
+
+    // public function TotalCharges() {
+    //     // $currentYear = DB::table('FinancialYear')->where('isCurrentYear', 1)->pluck('FinancialYearId');
+    //     return $this->currentCharges()>sum('Amount');
+    // }
 
     public function id()
     {

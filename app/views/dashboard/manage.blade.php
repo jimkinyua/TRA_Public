@@ -52,7 +52,7 @@
                 <div class="content">
                     <div class="menu">
                          <?php $cid = Session::get('customer')->id() ?>
-                        <a class="item" href="{{route('application.invoices')}}">Register Fleet</a>
+                        <a class="item" href="{{route('dashboard.fleet')}}">Register Fleet</a>
                         <a class="item" href="{{route('receipts.view', [ 'cid' => $cid ] )}}">Registered Fleets</a>
                     </div>
                 </div>
@@ -86,7 +86,8 @@
                 <div class="content">
                     <div class="menu">
                         <a id="register-business" class="item" href="{{route('dashboard.business')}}">Register Businness</a>
-                        <a id="registered-businesses" class="item" href="{{route('list.businesses')}}">View Registered Accounts</a>
+                        <a id="registered-businesses" class="item" href="{{route('portal.accounts', [ 'cid' => Session::get('customer')->id() ])}}">View Registered Accounts</a>
+                    
                     </div>
                 </div>
             </div>
