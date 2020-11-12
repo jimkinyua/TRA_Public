@@ -6,7 +6,7 @@
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
         <h3 class="ui dividing header" style="margin-top: 0;">Business Registration Form</h3>
-
+        
         @foreach ($form->sections() as $section )
             @if ($section->Show)
                 @if ( count($section->columns()) > 0 )
@@ -38,10 +38,9 @@
                 @endif
             @endif
         @endforeach
-
                           
         <div class="ui attached segment">
-            <h4 class=" ui dividing header">Attachments  6465 </h4>
+            <h4 class=" ui dividing header">Attachments </h4>
             <table class="ui red table">
               <thead>
                   <tr>
@@ -80,19 +79,11 @@
 
         <div id="searchresults" style="display: none;"> </div>
 
-        <div class="ui icon message">
-            <i class="red warning sign icon"></i>
-            <div class="content">
-                <div class="header">
-                    NOTICE
-                </div>
-                <p>Submitting False Information Attracts Respective Penalty on the Applicant</p>
-            </div>
-        </div>
+
 
         <div class="ui section divider"></div>
 
-        <button class="ui fluid green button"> Submit </button>
+        <button class="ui fluid green button"> Next </button>
 
     </form>
 @endsection

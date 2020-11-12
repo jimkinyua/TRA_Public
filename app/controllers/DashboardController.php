@@ -223,10 +223,24 @@ class DashboardController extends Controller {
     return json_encode($d);
   }
 
-  public function applicationform($cat) { // For Any Service
+  public function applicationform($cat) { //Category ID as PARAM
     if($cat == 0) {
 
     }
+<<<<<<< HEAD
+=======
+
+    
+    // echo '<pre>';
+    // print_r(Session::get('customer'));
+    // exit;
+
+
+
+    //  echo '<pre>';
+    // print_r($InspectionOfficers);
+    // exit;
+>>>>>>> master
         
       $ServiceStatusID = DB::table('ServiceHeader')
       ->select(['ServiceHeader.ServiceStatusID',
@@ -377,6 +391,7 @@ class DashboardController extends Controller {
       
     $ServiceCategoryID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
 
+<<<<<<< HEAD
     $ServiceID = DB::table('Services')->where('ServiceCategoryID', intval($cat))->pluck('ServiceID');
       // echo '<pre>';
       // print_r($ServiceID);
@@ -393,6 +408,17 @@ class DashboardController extends Controller {
     ->get();
     
    
+=======
+    
+      //->pluck(['ServiceStatusDisplay']);
+
+      // print_r($ApplicationStatus);exit;
+
+    $ServiceCategoryID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
+
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->where('ServiceGroupID', Session::get('customer')->BusinessTypeID)->get();
+    $services = Service::select(['ServiceName', 'ServiceID'])->where('ServiceCategoryID', intval($cat))->get();
+>>>>>>> master
 
     $services = Service::where('ServiceCategoryID', intval($cat))->get();
     
@@ -420,8 +446,12 @@ class DashboardController extends Controller {
     return View::make('applications/form', ['ServiceStatusID' => $ServiceStatusID,
      'ServiceStatusDisplay' => $ServiceStatusDisplay, 
      'bill' => $bill, 'services' => $services, 'form' => $form,
+<<<<<<< HEAD
      'categoryName'=>$categoryName,
      'ServiceID'=>$ServiceID,
+=======
+     'categoryName'=>$categoryName,'ServiceID'=>$ServiceCategoryID,
+>>>>>>> master
      'docs'=>$docs, 'categoryID'=>$categoryID, 
      'ServiceCategoryID'=>$ServiceCategoryID, 
      'ServiceGroupID'=>$ServiceGroupID,
@@ -445,6 +475,187 @@ class DashboardController extends Controller {
 
     return View::make('dashboard.business', ['bill' => $bill, 'location' => $locform, 'form'=> $form, 'docs'=>$docs]);
   }
+
+  public function addBusinessDirectors($id) {
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+      $CompanyDirectors  = Directors::select(['FirstName', 
+        'LastName', 'KRAPIN', 'IDNO', 'created_at'])
+       ->where('CompanyID',
+        intval($id)
+      )->get();
+    return View::make('dashboard.director', [
+      'bill' => $bill,
+      'CustomerId'=>$id,
+      'Directors'=>$CompanyDirectors
+
+     ]);
+  }
+
+  
+
+  public function registerFleet() {
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])
+    ->get();
+    $CustomerId = Session::get('customer')->CustomerID;
+
+    //Get Any Fleets Registered Under the Company If ANy
+    $Fleets = Fleets::select(['FleetId', 
+        'RegNo', 'OwnerName', 'Make', 'Model', 'created_at'])
+        ->where('CustomerId',
+      intval($CustomerId )
+    )->get();
+
+    return View::make('dashboard.fleet', ['bill' => $bill, 
+    'Fleets'=>$Fleets,
+    'CustomerId'=>$CustomerId]);
+  }
+  public  function  SubmitFleet(){
+    $col = Input::all();
+    $messages = [
+      'RegNo' => 'Please specify the RegNo',
+      'ChasisNo' => 'Please specify the ChasisNo',
+    ];
+    $rules = [
+      'ChasisNo'=> 'required',
+      'RegNo'=> 'required',
+
+    ];
+
+    $validator = Validator::make(Input::all(), $rules, $messages);
+    if ($validator->fails()) { return Redirect::back()->withErrors($validator);  }
+
+
+    // $m = $this->checkTourVehicle_License($col['RegNo']);
+
+    //Remove All White Spaces and TABS
+    $RegNo =  strtoupper(preg_replace('/\s/', '', $col['RegNo']));
+    
+    $DataOfVehicle  = $this->GetVehicleInfoFromNTSA($RegNo);
+    // echo '<pre>';
+    // print_r($DataOfVehicle );
+    // exit;
+    if(empty($DataOfVehicle['error'])){ //Vehicle is in NTSA System
+      
+      //Extract PIN No of the Owner
+      $OwnerData = (object)$DataOfVehicle['owner'][0];
+      $OurDatabaseResult = $this->IsVehicleRegisteredInOurDatabase($RegNo);
+      if($OurDatabaseResult === false){ //Not In Our Db
+        $DirectorResult = $this->IsVehicleOwnedByCompanyDirector($OwnerData->pin);
+        $VehicleResult = $this->IsVehicleOwnedByCompany($OwnerData->pin);
+  
+        //If Vehicle is Owned By Director or Org. Register It
+        if($DirectorResult === true || $VehicleResult === true){
+          // Register the Damn Vehicle
+          $fleet = new CustomerFleet();
+          $fleet->RegNo=$RegNo;
+          $fleet->OwnerPIN=Session::get('customer')->PIN;
+          $fleet->ChasisNo=Input::get('ChasisNo');
+          $fleet->CustomerId=Session::get('customer')->CustomerID;
+          $fleet->OwnerName=$OwnerData->names;
+          $fleet->Make=$DataOfVehicle['make'];
+          $fleet->Model=$DataOfVehicle['model'];
+  
+          if($fleet->save()){
+             //Get Any Fleets Registered Under the Company If ANy
+    
+            Session::flash('message','Fleet registered successfully');
+                return Redirect::back();
+          }
+        }else{
+          Session::flash('message', 'Please Ensure The Vehicle is Owned by the Organization or either of Company Directors');
+          return Redirect::route('dashboard.fleet');
+        }
+      }else{
+        Session::flash('message', 'The Vehicle is already Registered In Our System');
+        return Redirect::route('dashboard.fleet');
+      }
+    }
+    Session::flash('message', 'Vehicle is Not Registered With NTSA');
+    return Redirect::route('dashboard.fleet');
+      
+
+  } 
+  
+  function IsVehicleOwnedByCompanyDirector($PinToCheck){
+    // var_dump($PinToCheck);
+    $BusinessId=Session::get('customer')->CustomerID;
+   
+    //Get Company Director/Directors
+    $Directors  = Directors::where('CompanyID', $BusinessId)
+    ->Select('KRAPIN')->get()->toArray();
+    
+    if($Directors){
+      foreach($Directors as $key => $Director) {
+        $m =strcmp($Director['KRAPIN'],$PinToCheck);
+
+        if($m == 0) { // Director Owns Vehicle!!
+          return true;
+        }
+
+    } //TODO Tell User Compnay Has no Directors!!
+ 
+  }
+
+  }
+
+  
+  function IsVehicleOwnedByCompany($PinToCheck){
+     
+      $BusinessPIN=Session::get('customer')->PIN;
+      $m =strcmp($BusinessPIN,$PinToCheck);
+
+      if($m == 0) { // Director Owns Vehicle!!
+        return true;
+      }
+      else{
+        return false;
+      }
+
+  }
+
+  function IsVehicleRegisteredInOurDatabase($VehicleRegNo){
+      //Get Any Fleets Registered Under the Company If ANy
+      $Fleets = Fleets::select(['FleetId'])
+      ->where('RegNo',
+      $VehicleRegNo )->get()->count();
+
+      // echo '<pre>';
+      // print_r($Fleets);
+      // exit;
+
+      if($Fleets > 0){
+        return true;
+      }else{
+        return false;
+      }
+  }
+  function GetVehicleInfoFromNTSA($regno)
+  { 
+            // echo $regno;
+            //https://portal.ntsa.go.ke/rsl_online/index.php
+    $url=    "https://portal.ntsa.go.ke/rsl_online/_getVehicle_details.php";
+    $username="tra";
+    $password="tra@123";
+    $param="regno=$regno";
+    $ch=curl_init();     
+    curl_setopt($ch,CURLOPT_URL,$url);
+    curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
+    curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+    curl_setopt($ch,CURLOPT_POSTFIELDS,$param);
+    // tell cURL to graciously not TO accept an SSL certificate 
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+
+    $result=curl_exec($ch); 
+    if($result === FALSE) {
+      die(curl_error($ch));
+  }
+
+    $data=json_decode($result,true);
+    return $data;
+  }
+
+
 
   public function payment($inv) {
     $invs = explode(',' , $inv);
@@ -980,7 +1191,8 @@ class DashboardController extends Controller {
   public function category($cat) {
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
     $services = Service::where('ServicecategoryID',$cat)->get();
-    //dd($services[2]->currentCharges()->get());
+    // dd($services->applicationCharges()->get());
+    // $service->applicationCharges
     return View::make('dashboard.category',[ 'bill' => $bill, 'services' => $services ]);
   }
 
@@ -1006,7 +1218,6 @@ class DashboardController extends Controller {
   }
 
   public function backend() {
-
     $post_data = ['uname' => Auth::user()->Email, 'passwd' => Session::get('password') ];
 
     $login_url = 'http://revenue.uasingishu.go.ke/admin/index.php';
