@@ -486,15 +486,12 @@ $ServiceCategoryID = DB::table('ServiceHeader')
   {     
     // exit('Nding');
 
-<<<<<<< HEAD
     $rules = [ 'service_id' => 'required' ];
-=======
     // ECHO '<PRE>';
     // print_r(Input::all());
     // exit;
 
     $rules = [ 'service_id' => 'required|exists:Services,ServiceID' ];
->>>>>>> master
     $valid = Validator::make(Input::all(), $rules);
     $cols = Input::get('ColumnID'); //Get dATA
     // print_r(Input::all());exit;

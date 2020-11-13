@@ -35,10 +35,14 @@
                  Please Note: You are applying for a rejected service.
                 </p>
               </div>
-@elseif($ServiceGroupID == 11 && ($appliedClassification != $ServiceID))
+
+  </p>
+</div>
+@elseif($appliedClassification !='' && $ServiceGroupID == 11 && ($appliedClassification != $ServiceID))
               <div class="ui ignored info message">
                 <p style="color:red;">
                  Please Note: You cannot apply for this classification.
+                 {{-- {{$appliedClassification}} --}}
                 </p>
               </div>
   @else
@@ -208,7 +212,7 @@
             </select>
         </div>
         @endif -->
-        hdhd
+        
         @foreach ($form->sections() as $section )
        
             @if ($section->Show && !$section->Optional)
@@ -280,8 +284,6 @@
         <div class="ui hidden divider"></div
 
 
-<<<<<<< HEAD
-=======
 @if($ApplicationsMade == 1)
   <div class="ui ignored info message">
                 <p style="color:red;">
@@ -289,7 +291,6 @@
                 </p>
               </div>
 @else
->>>>>>> master
         <div class="ui section divider"></div>
 
         <div id="searchresults" style="display: none;"> </div>
@@ -304,7 +305,7 @@
                 <p>You need a licence before making this application</p>
             </div>
         </div>
-        @elseif($ServiceGroupID == 11 && ($appliedClassification!=$ServiceID))
+        @elseif($appliedClassification != '' && $ServiceGroupID == 11 && ($appliedClassification!=$ServiceID))
         <div class="ui icon message">
             <i class="red warning sign icon"></i>
             <div class="content">
@@ -520,3 +521,4 @@
     </script>
     @parent
 @endsection
+@endif

@@ -227,8 +227,6 @@ class DashboardController extends Controller {
     if($cat == 0) {
 
     }
-<<<<<<< HEAD
-=======
 
     
     // echo '<pre>';
@@ -240,7 +238,6 @@ class DashboardController extends Controller {
     //  echo '<pre>';
     // print_r($InspectionOfficers);
     // exit;
->>>>>>> master
         
       $ServiceStatusID = DB::table('ServiceHeader')
       ->select(['ServiceHeader.ServiceStatusID',
@@ -272,6 +269,9 @@ class DashboardController extends Controller {
       ->join('ServiceStatus','ServiceStatus.ServiceStatusID','=','ServiceHeader.ServiceStatusID')
       ->orderBy('ServiceHeader.CreatedDate', 'desc')
       ->pluck(['ServiceStatusID']);
+      // echo '<pre>';
+      // print_r($appliedService);
+      // exit;
 
       $rejectedService = DB::table('ServiceHeader')
       ->select([
@@ -293,7 +293,8 @@ class DashboardController extends Controller {
       ->pluck(['ServiceStatusID']);
     
       $appliedClassification = DB::table('ServiceHeader')
-      ->select(['Services.ServiceID',
+      ->select(['ServiceHeader.ServiceCategoryID',
+            'Services.ServiceID',
             'ServiceHeader.ServiceStatusID',
             'ServiceHeader.ServiceHeaderID',
             'ServiceHeader.PermitNo as No',
@@ -307,6 +308,9 @@ class DashboardController extends Controller {
       ->join('ServiceStatus','ServiceStatus.ServiceStatusID','=','ServiceHeader.ServiceStatusID')
       ->orderBy('ServiceHeader.CreatedDate', 'desc')
       ->pluck(['ServiceStatusID']);
+      
+
+
 
       $ServiceStatusDisplay = DB::table('ServiceHeader')
       ->select([ 'ServiceStatus.ServiceStatusDisplay',
@@ -391,12 +395,14 @@ class DashboardController extends Controller {
       
     $ServiceCategoryID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
 
-<<<<<<< HEAD
-    $ServiceID = DB::table('Services')->where('ServiceCategoryID', intval($cat))->pluck('ServiceID');
-      // echo '<pre>';
-      // print_r($ServiceID);
-      // exit;
     
+      //->pluck(['ServiceStatusDisplay']);
+
+      // print_r($ApplicationStatus);exit;
+
+    $ServiceCategoryID = DB::table('ServiceCategory')
+    ->where('ServiceCategoryID', intval($cat))
+    ->pluck('ServiceCategoryID');
 
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])
     ->where('ServiceGroupID', Session::get('customer')->BusinessTypeID)
@@ -406,19 +412,10 @@ class DashboardController extends Controller {
                       ->orwhere('ServiceGroupID', '=', 12);
             })
     ->get();
+    $services = Service::select(['ServiceName', 'ServiceID'])
+    ->where('ServiceCategoryID', intval($cat))
+    ->get();
     
-   
-=======
-    
-      //->pluck(['ServiceStatusDisplay']);
-
-      // print_r($ApplicationStatus);exit;
-
-    $ServiceCategoryID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
-
-    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->where('ServiceGroupID', Session::get('customer')->BusinessTypeID)->get();
-    $services = Service::select(['ServiceName', 'ServiceID'])->where('ServiceCategoryID', intval($cat))->get();
->>>>>>> master
 
     $services = Service::where('ServiceCategoryID', intval($cat))->get();
     
@@ -446,12 +443,8 @@ class DashboardController extends Controller {
     return View::make('applications/form', ['ServiceStatusID' => $ServiceStatusID,
      'ServiceStatusDisplay' => $ServiceStatusDisplay, 
      'bill' => $bill, 'services' => $services, 'form' => $form,
-<<<<<<< HEAD
      'categoryName'=>$categoryName,
-     'ServiceID'=>$ServiceID,
-=======
-     'categoryName'=>$categoryName,'ServiceID'=>$ServiceCategoryID,
->>>>>>> master
+     'ServiceID'=>$ServiceCategoryID,
      'docs'=>$docs, 'categoryID'=>$categoryID, 
      'ServiceCategoryID'=>$ServiceCategoryID, 
      'ServiceGroupID'=>$ServiceGroupID,
