@@ -61,7 +61,7 @@
                     <td>
                      
 
-                      <input type="file" id="files[]" name="files[{{$docs[$i]->DocumentID }}]" value="" required />
+                      <input type="file" id="files[]" name="files[{{$docs[$i]->DocTypeID }}]" value="" required />
 
                     </td>
                     {{-- <td><button class="ui primary button">Upload</button></td> --}}

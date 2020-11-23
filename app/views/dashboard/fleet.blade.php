@@ -6,7 +6,16 @@
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
         <h3 class="ui dividing header" style="margin-top: 0;">Fleet Registration Form</h3>
-                          
+        <div class="ui icon message">
+          <i class="pink warning sign icon"></i>
+          <div class="content">
+            <div class="header">
+                Please Note
+            </div>
+              <p>Only Holders of a Tours and Travel, Tourism Vehicle Hire Licences are allowed to Register Fleets</p> 
+              <p>Submitting False Information Attracts Respective Penalty on the Applicant</p> 
+          </div>
+      </div>
         <div class="ui hidden divider"></div>
         <div class="ui basic segment">
             <div class="required field">
@@ -14,11 +23,11 @@
               {{ Form::text('RegNo') }}
             </div>
             <div class="required field">
-              {{ Form::label('ChasisNo', 'Chasis No') }}
-              {{ Form::text('ChasisNo') }}
+              {{ Form::label('LicenceNo', 'Licence Number') }}
+              {{ Form::text('LicenceNo') }}
             </div>
         </div>
-          <div class="ui icon message">
+          {{-- <div class="ui icon message">
             <i class="red warning sign icon"></i>
             <div class="content">
                 <div class="header">
@@ -26,7 +35,7 @@
                 </div>
                 <p>Submitting False Information Attracts Respective Penalty on the Applicant</p>
             </div>
-        </div>
+        </div> --}}
             {{ Form::submit('Submit', ['class' => 'ui fluid purple button']) }}
         {{ Form::close() }}
 

@@ -33,6 +33,8 @@ class BusinessController extends BaseController{
 
   
     public function postAddBusiness() {
+      
+
         $rules = [
             'ColumnID.4176' => 'required|string',
             'ColumnID.4182' => 'required|string',
@@ -79,55 +81,60 @@ class BusinessController extends BaseController{
         // exit;
 
 
+
         //dd(Input::all());
 
         $valid = Validator::make(Input::all(),$rules, $msgs);
 
         if ($valid->passes()){
-            $input = Input::all();
-            
-            //dd(Session::get('customer'));
-            $col = Input::get('ColumnID');
-            // echo '<pre>';
-            // print_r($col);
-            // exit;
+            DB::beginTransaction();
+            try{
+              
+              $input = Input::all();
+              $col = Input::get('ColumnID');
+              $agent = Auth::user();
 
-           
+              $customer = Customer::create([
+                'PIN' => $col[4182],
+                'Type' => 'business',
+                //'Ward' => $col[1165],
+                //'Ward' => $col[11204],
+                'Email' => $col[4180],
+                'Website' => $col[4181],
+                //'SubCounty' => $col[4185],
+                //'SubCounty' => $col[11203],
+                'ContactPerson' => $agent,
+                'PostalCode' => $col[4178],
+                'Mobile1' => $col[12240],
+                // 'Telephone1' => $col[4179],
+                'BusinessTypeID' => $col[13283],
+                'CustomerTypeID' => $col[13283],
+                'BusinessZone' => $col[12256],
+                'CustomerName' => $col[4176],
+                'PostalAddress' => $col[4177],
+                'BusinessID' => $col[4184], //Business Permit NO (If the business has a permit)
+                // 'BusinessRegistrationNumber' => $col[12247], //Certificte of Registration/ ID
+                'PlotNo' => $col[12238],
+                // 'PhysicalAddress' =>$col[12256],
+              ]);
+              
+              CustomerAgent::create([
+                'AgentRoleID' => 2,
+                'AgentID'  => $agent->id(),
+                'CustomerID' => $customer->id(),
+              ]);
+              
+              if(!empty(Input::file())) 
+              {
+                $this->UploadDocuments(Input::file(),$customer->id());
+              }
 
-            $agent = Auth::user();
-
-            $customer = Customer::create([
-              'PIN' => $col[4182],
-              'Type' => 'business',
-              //'Ward' => $col[1165],
-              //'Ward' => $col[11204],
-              'Email' => $col[4180],
-              'Website' => $col[4181],
-              //'SubCounty' => $col[4185],
-              //'SubCounty' => $col[11203],
-              'ContactPerson' => $agent,
-              'PostalCode' => $col[4178],
-              'Mobile1' => $col[12240],
-              // 'Telephone1' => $col[4179],
-              'BusinessTypeID' => $col[13283],
-              'CustomerTypeID' => $col[13283],
-              'BusinessZone' => $col[12256],
-              'CustomerName' => $col[4176],
-              'PostalAddress' => $col[4177],
-              'BusinessID' => $col[4184], //Business Permit NO (If the business has a permit)
-              // 'BusinessRegistrationNumber' => $col[12247], //Certificte of Registration/ ID
-			        'PlotNo' => $col[12238],
-              // 'PhysicalAddress' =>$col[12256],
-            ]);
-            
-            // print_r($customer);
-            // exit;
-
-            CustomerAgent::create([
-              'AgentRoleID' => 2,
-              'AgentID'  => $agent->id(),
-              'CustomerID' => $customer->id(),
-            ]);
+              DB::commit();
+            }catch(\Exception $e){
+              //if there is an error/exception in the above code before commit, it'll rollback
+              DB::rollBack();
+              return $e->getMessage();
+            }
 
             $customers = DB::table('CustomerAgents')
                 ->where('AgentID', $agent->id())
@@ -144,6 +151,78 @@ class BusinessController extends BaseController{
         return Redirect::back()->withErrors($valid)->withInput(Input::all());
     }
 
+    public function UploadDocuments($FilesToUpload, $ApplicantId){
+      
+          $destinationPath = storage_path('uploads');
+          // $files = $input;
+          // $i=0;
+  
+         
+          foreach ($FilesToUpload as $key => $file) 
+          {
+         
+            if(!is_null($file))
+            {
+              foreach($file as $Key => $FileData){
+                $DocTypeId=$Key;
+                $BusinessNo= $ApplicantId; //(Session::get('customer')->CustomerID);
+                $name = $FileData->guessClientExtension();
+                $fileName = $FileData->getClientOriginalName();//time().'.'.$file->getClientOriginalExtension();
+                $Name = $FileData->getClientOriginalName();
+                 
+    
+                $destination=$destinationPath."/".$DocTypeId."/".$BusinessNo;
+
+                  //
+                if (!file_exists($destination)) {
+                  mkdir($destination, 0777, true);
+                }
+                $DocumentPath=$destination."/".$fileName;
+             
+                $FileData->move($DocumentPath, $fileName);            
+                $document = new BusinessAttacheMents();
+                $document->BusinessNo = $ApplicantId;
+                $document->DocTypeId = $DocTypeId;
+                $document->DocumentPath=$DocumentPath;
+                $document->FileName=$fileName;
+                $document->IsCurrent =true;
+                $document->save();
+
+              }
+                                    
+            }
+          }
+      
+    }
+
+    public function removeDirector($DirectorId){
+      //Ensure Director Id Passed Belongs to the Company Selected. People are Cheecky!!
+      // $m =Directors::where('CompanyID', intval(Session::get('customer')
+      //           ->CustomerID))
+      //           ->get()
+      //           ->pluck('DirectorsID');
+      $m = Directors::where('DirectorsID',intval($DirectorId))
+      ->pluck('CompanyID');
+
+      if(!$m == intval(Session::get('customer')->CustomerID)){
+          //Not a Director in that Company!!!
+          Session::flash('message','Stop That!!!');
+          return Redirect::back();
+      }
+      $Directors = Directors::find($DirectorId);
+      $Directors->Deleted = 1;
+      
+      if($Directors->save()){
+        //Not a Director in that Company!!!
+        Session::flash('message','Director Removed Succesfully');
+        return Redirect::back();
+      }
+
+      // Directors::where('id',$DirectorId)->update(['Deleted'=>true]);
+
+      
+    }
+
     public function postBusinessDirectors(){
     
       $rules = [
@@ -151,6 +230,8 @@ class BusinessController extends BaseController{
           'LastName' => 'required',
           'PinNo' => 'required',
           'IdNo' => 'required',
+          'CountryId'=>'required',
+          'PhoneNumber'=>'required',
       ];
 
 
@@ -159,6 +240,9 @@ class BusinessController extends BaseController{
         'LastName' => 'LastName is required.',
         'PinNod' => 'KRA PIN is required.',
         'IdNo' => 'IdNo is required.',
+        'PhoneNumber'=>'IdNo is required.',
+        'CountryId'=>'Your Country is Required '
+
       ];
 
       // echo '<pre>';
@@ -180,9 +264,19 @@ class BusinessController extends BaseController{
           $Director->KRAPIN =  $input['PinNo'];
           $Director->IDNO = $input['IdNo'];
           $Director->CompanyID = $input['CustomerId']; 
+          $Director->PhoneNumber = $input['PhoneNumber']; 
+          $Director->CountryId = $input['CountryId']; 
+          $Director->MiddleName = $input['MiddleName']; 
+
+
 
           if($Director->save()){
+            //Save Attachements if Any
+            if(Input::file()){
+             
 
+              $this->UploadBusinessDirectorDocuments(Input::file(), $Director->id());
+            }
             $CompanyDirectors  = Directors::select(['FirstName', 
             'LastName', 'KRAPIN', 'IDNO', 'created_at'])
               ->where('CompanyID',
@@ -201,8 +295,52 @@ class BusinessController extends BaseController{
       }
 
       return Redirect::back()->withErrors($valid)->withInput(Input::all());
-  }
+    }
 
+  public function UploadBusinessDirectorDocuments($FilesToUpload, $DirectorId){
+      
+    $destinationPath = storage_path('uploads');
+    // $files = $input;
+    // $i=0;
+
+
+    foreach ($FilesToUpload as $key => $FileData) 
+    {
+  
+           
+
+      if(!is_null($FileData))
+      {
+        
+          $DirectorId= $DirectorId; //(Session::get('customer')->CustomerID);
+          $name = $FileData->guessClientExtension();
+          $fileName = $FileData->getClientOriginalName();//time().'.'.$file->getClientOriginalExtension();
+          $Name = $FileData->getClientOriginalName();
+           
+
+          $destination=$destinationPath."/".$DirectorId;
+
+            //
+          if (!file_exists($destination)) {
+            mkdir($destination, 0777, true);
+          }
+          $DocumentPath=$destination."/".$fileName;
+       
+          $FileData->move($DocumentPath, $fileName);            
+          $document = new ForeignBusinessOwnersAttachements();
+          $document->DocTypeId = 1;
+          $document->DirectorsID = $DirectorId;
+          $document->DocumentPath=$DocumentPath;
+          $document->FileName=$fileName;
+          $document->IsCurrent =true;
+          $document->save();
+
+        
+                              
+      }
+    }
+
+}
 
   public function postUpdateBusiness() {
 

@@ -8,32 +8,107 @@
          Director
         </div>
         <div class="image content">
-            <form class="ui form" method="post" action="{{ route('post.add.Directors') }}">
-                <input type="hidden" name="CustomerId" value="{{ $CustomerId }}">
+            <form class="ui form" method="post" enctype = "multipart/form-data" action="{{ route('post.add.Directors') }} ">
+              
+              <input type="hidden" name="CustomerId" value="{{ $CustomerId }}">
+              <div class="ui four column  grid">
 
-                <div class="required  field">
-                  <label>First Name</label>
-                  <input type="text" name="FirstName" 
-                  placeholder="First Name">
+                  <div class="two column">
+                    <div class="required  field">
+                      <label>First Name</label>
+                      <input type="text" name="FirstName" 
+                      placeholder="First Name" class="row">
+                      </div>
                 </div>
 
-                <div class="required  field">
-                  <label>Last Name</label>
-                  <input type="text" name="LastName"
-                   placeholder="Last Name">
+                  <div class="two column">
+                    <div class="  field">
+                      <label>Middle Name</label>
+                      <input type="text" name="MiddleName"
+                      placeholder="Middle Name">
+                    </div>
                 </div>
 
-                <div class="required  field">
-                    <label>KRA Pin No</label>
-                    <input type="text" name="PinNo"
-                     placeholder="KRA Pin No">
-                </div>
-
-                <div class="required  field">
-                    <label>ID Number</label>
-                    <input type="text" name="IdNo" 
+                <div class="column">
+                  <div class="required  field">
+                    <label>Last Name</label>
+                    <input type="text" name="LastName"
                     placeholder="Last Name">
+                  </div>
                 </div>
+
+
+              </div>
+               
+              <div class="ui four column  grid">
+
+                  <div class="two column">
+                    
+                    <div class="required  field">
+                      <label>KRA Pin No</label>
+                      <input type="text" name="PinNo"
+                       placeholder="KRA Pin No">
+                    </div>
+
+                  </div>
+
+                  <div class="two column">
+                    <div class="required  field">
+                      <label>ID/Passport/Huduma Number</label>
+                      <input type="text" name="IdNo" 
+                      placeholder="ID/Passport/Huduma Number">
+                    </div>
+                  </div>
+
+                  <div class=" two column">
+                    <div class="required  field">
+                      <label>PhoneNumber</label>
+                      <input type="number" name="PhoneNumber" 
+                      placeholder="Phone Number">
+                    </div>
+                  </div>
+
+
+              </div>
+
+              <div class="ui  column  grid">
+
+                <div class=" column">
+                  
+                  <div class="required  field">
+                    <label>Nationality</label>
+                    <div class="ui fitted hidden divider"></div>
+                    <select name="CountryId" class="ui  dropdown" id="CountryId" >
+                        <option value="0" > Select Country </option>
+                        @foreach($Countries as $index => $Country)
+                            <option value="{{$Country->id()}}" > <strong> {{$Country->Name}}
+                        @endforeach
+                    </select>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="ui  column  grid">
+                <div class=" column"> 
+                  <div class="ui attached segment">       
+                    <div class="required DirectorAttachements  field">
+                      <div class="  field">
+                        <label>Work Permit</label>
+                        <input type="file" name="WorkPermit"
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              
+
+              
+
+
 
                    
         </div>
@@ -86,8 +161,8 @@
               <tr>
                 <th></th>
                 <th colspan="4">
-                  <div class="ui right floated small primary labeled icon button">
-                    <i class="user icon" id ="AddDirector"></i> Add Director
+                  <div class="ui right floated small primary labeled icon button" id ="AddDirector">
+                    <i class="user icon"></i> Add Director
                   </div>
   
                 </th>
@@ -105,7 +180,7 @@
             </div>
         </div>
             {{ Form::submit('Submit', ['class' => 'ui fluid purple button']) }}
-        {{ Form::close() }}
+    {{ Form::close() }}
 
 
 
@@ -117,15 +192,26 @@
 @section('script')
     <script type="text/javascript">
         $( document ).ready(function() {
-          console.log('dedupe');
+          $('.DirectorAttachements').hide();
           $('#AddDirector').click(function(){
             $('.ui.modal').modal({
-                centered: false
+                centered: true
             }).modal('show');
 
             this.preventDefault();
-        });
+          });
         
+        $('#CountryId').change(function(){
+            // alert($('#CountryId').val());
+            val = $('#CountryId').val();
+            if(val == 110){
+              $('.DirectorAttachements').hide();
+              return false;
+            }
+            $('.DirectorAttachements').show();
+
+        });
+
             $('#dashboard-menu #manage').trigger('click');
             $('.ui.accordion').accordion();
             $('.ui.dropdown').dropdown();

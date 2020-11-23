@@ -12,6 +12,9 @@ class ServiceHeader extends \Eloquent {
     {
         return $this->ServiceHeaderID;
     }
+    public function Licences() { 
+        return $this->hasMany('Permits','ServiceHeaderID');
+      }
 
 
 }

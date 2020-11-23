@@ -6,4 +6,5 @@ return array(
     'database'=>'TRANEW',
     'user'=>'sa',
     'password'=>'portalman',
+
 );

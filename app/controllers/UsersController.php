@@ -552,6 +552,45 @@ class UsersController extends \BaseController {
           'BusinessTypeID'=>13283
         ];
 
+        //Get Business Attachements
+        $Countries = Countries::select(['Id', 'Name'])->get();
+
+        $BusinessAttacheMents = DB::table('BusinessAttacheMents as BA')
+                                ->where('BA.BusinessNo', Session::get('customer')->CustomerID)
+                                ->join('BusinessRegistrationDocumentTypes as BRT', 'BRT.DocTypeID', '=', 'BA.DocTypeID')
+                                ->get();
+
+         
+        $Directors = Directors::with('Attachements')
+        ->where('CompanyID','=',Session::get('customer')->CustomerID)
+        ->where('Deleted',0)
+        ->get();
+     
+        //Get Attachemenets
+        $DirectorAttachements = false;
+        if($Directors){
+            foreach($Directors as $Director){
+                if(isset($Director->Attachements)){
+                    if($Director->Attachements){
+                        $DirectorAttachements = $Director->Attachements;
+                    }
+                }
+             
+            }
+        }
+     
+       
+
+        $CompanyDirectors  = Directors::select(['DirectorsID','FirstName', 
+        'LastName', 'KRAPIN', 'IDNO', 'created_at'])
+            ->where('CompanyID',intval(Session::get('customer')->CustomerID))
+            ->where('Deleted',0)
+            ->get();
+        
+        // echo '<pre>';
+        // print_r($CompanyDirectors );
+        // exit;
+
 
         $data = $d = [];
         foreach ($fields as $key => $value) {
@@ -560,7 +599,14 @@ class UsersController extends \BaseController {
         }
         foreach($data as $k=>$v) { $i = key($v);  $d[$i] = $v[$i]; }
         //dd($d);
-        return View::make('auth.businessprofile', ['bill'=>$bill, 'form'=> $form, 'application' => $d ]);
+        return View::make('auth.businessprofile', ['bill'=>$bill,
+            'form'=> $form, 
+            'application' => $d,
+            'BusinessAttacheMents'=>$BusinessAttacheMents,
+            'Directors'=>$CompanyDirectors,
+            'Countries'=>$Countries,
+            'DirectorAttachements'=>$DirectorAttachements
+          ]);
     }
     /**
      * Show user profile as per user

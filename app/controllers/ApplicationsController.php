@@ -335,6 +335,11 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     $ServiceCategoryId = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->pluck('ServiceCategoryId');
     $categoryName = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($ServiceCategoryId))->pluck('CategoryName');
     $LicenceData = ServiceHeader::where('ServiceHeaderID', $ServiceHeaderID)->get();
+    $PermitsData = Permits::where('ServiceHeaderID',3116)->get();
+    // echo '<pre>';
+    // print_r($PermitsData);
+    // exit;
+
     if(is_null($formID)) {
       Session::flash('message','Application not found');
       return Redirect::route('portal.home');
@@ -389,7 +394,8 @@ $ServiceCategoryID = DB::table('ServiceHeader')
       'service' => $service , 'services' => $services, 
       'header' => $ServiceHeaderID,
       'ISPastEndOfWaiver'=>$ISPastEndOfWaiver,
-      'DaysPast'=>$DaysPast
+      'DaysPast'=>$DaysPast,
+      'PermitsData'=>$PermitsData
     ]);
   }
 
