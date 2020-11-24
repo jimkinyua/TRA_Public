@@ -63,7 +63,7 @@ Route::group([], function()
 
 		Route::get('account', ['as' => 'portal.account', 'uses' => 'SettingsController@account']);
 		Route::get('profile',['as'=>'my.profile','uses'=>'UsersController@showMyProfile']);
-		Route::get('businessprofile/{cid}',['as'=>'business.profile','uses'=>'UsersController@businessProfile']);
+		Route::get('businessprofile/{cid}',['as'=>'business.profile','uses'=>'UsersController@businessProfile']); 
 		Route::post('businessprofile',['as'=>'update.business.profile','uses'=>'BusinessController@postUpdateBusiness']);
 		Route::get('removeDirector/{directorid}',['as'=>'business.removedirector','uses'=>'BusinessController@removeDirector']);
 
