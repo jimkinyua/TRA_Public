@@ -1,9 +1,17 @@
 <?php
 
+// return array(
+//     'driver'=>'sqlsrv',
+//     'server' => 'TRA-EDMS\SQLTRA',
+//     'database'=>'TRANEW',
+//     'user'=>'sa',
+//     'password'=>'portalman',
+// );
+
 return array(
     'driver'=>'sqlsrv',
-    'server' => 'TRA-EDMS\SQLTRA',
+    'server' => 'TRA\SQL2017',
     'database'=>'TRANEW',
-    'user'=>'sa',
+    'user'=>'portalman',
     'password'=>'portalman',
 );
