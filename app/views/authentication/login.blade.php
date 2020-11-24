@@ -78,11 +78,11 @@
 
             </div>
           </div>
-
+{{-- 
           <div id="feature" class="eight wide column" style=" overflow-y: auto;">
             <div  class="ui basic segment" style=" overflow-y: auto;">
               <h3 class="ui dividing  header"> <strong> What is TRA Self Help Portal? </strong> </h3>
-              {{-- <p>
+              <p>
                 TRA is constantly improving its service delivery to citizens and the business community.
                 E-services portal is your one-stop-shop to make dealing with the company easy. Services are available 24/7 and throughout the week.
                 Apply the service anywhere from the comfort of your home,

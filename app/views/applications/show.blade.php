@@ -55,7 +55,7 @@
                   <label>Licence Number</label>
                   <div class="ui fitted hidden divider "></div>
 
-                  <input type="text" value="{{$LicenceData[0]['PermitNo']}}" disabled="true"></input>
+                  <input type="text" value="{{$PermitsData[0]['id']}}" disabled="true"></input>
               </div>
               <div class="ui fitted hidden divider "></div>
 

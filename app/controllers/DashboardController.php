@@ -461,7 +461,7 @@ class DashboardController extends Controller {
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
     $form = ServiceForm::findOrFail(1);
     $locform = ServiceForm::findOrFail(3);
-    $docs=DB::select('select * from vwRequiredDocuments where ServiceCategoryID=2039'); 
+    $docs=DB::select('select * from BusinessRegistrationDocumentTypes'); //where ServiceCategoryID=2039'); 
     // ECHO '<PRE>';
     // print_r($docs);
     // exit;
@@ -476,10 +476,13 @@ class DashboardController extends Controller {
        ->where('CompanyID',
         intval($id)
       )->get();
+
+      $Countries = Countries::select(['Id', 'Name'])->get();
     return View::make('dashboard.director', [
       'bill' => $bill,
       'CustomerId'=>$id,
-      'Directors'=>$CompanyDirectors
+      'Directors'=>$CompanyDirectors,
+      'Countries'=>$Countries
 
      ]);
   }
@@ -506,10 +509,12 @@ class DashboardController extends Controller {
     $col = Input::all();
     $messages = [
       'RegNo' => 'Please specify the RegNo',
-      'ChasisNo' => 'Please specify the ChasisNo',
+      'LicenceNo' => 'Please specify the Licence Number',
+      'LicenceNo.exists' => 'There is no Such Licence Under Your Business Profile',
+
     ];
     $rules = [
-      'ChasisNo'=> 'required',
+      'LicenceNo'=> 'required|Integer|exists:Permits,id',
       'RegNo'=> 'required',
 
     ];
@@ -517,58 +522,96 @@ class DashboardController extends Controller {
     $validator = Validator::make(Input::all(), $rules, $messages);
     if ($validator->fails()) { return Redirect::back()->withErrors($validator);  }
 
+    $IsAllowed = $this->IsLicenceAllowedToRegisterFleets($col['LicenceNo']);
+    if( $IsAllowed === true){
+          //Remove All White Spaces and TABS
+         $RegNo =  strtoupper(preg_replace('/\s/', '', $col['RegNo']));
 
-    // $m = $this->checkTourVehicle_License($col['RegNo']);
+         $DataOfVehicle  = $this->GetVehicleInfoFromNTSA($RegNo);
 
-    //Remove All White Spaces and TABS
-    $RegNo =  strtoupper(preg_replace('/\s/', '', $col['RegNo']));
-    
-    $DataOfVehicle  = $this->GetVehicleInfoFromNTSA($RegNo);
-    // echo '<pre>';
-    // print_r($DataOfVehicle );
-    // exit;
-    if(empty($DataOfVehicle['error'])){ //Vehicle is in NTSA System
+        if(empty($DataOfVehicle['error'])){ //Vehicle is in NTSA System
       
-      //Extract PIN No of the Owner
-      $OwnerData = (object)$DataOfVehicle['owner'][0];
-      $OurDatabaseResult = $this->IsVehicleRegisteredInOurDatabase($RegNo);
-      if($OurDatabaseResult === false){ //Not In Our Db
-        $DirectorResult = $this->IsVehicleOwnedByCompanyDirector($OwnerData->pin);
-        $VehicleResult = $this->IsVehicleOwnedByCompany($OwnerData->pin);
-  
-        //If Vehicle is Owned By Director or Org. Register It
-        if($DirectorResult === true || $VehicleResult === true){
-          // Register the Damn Vehicle
-          $fleet = new CustomerFleet();
-          $fleet->RegNo=$RegNo;
-          $fleet->OwnerPIN=Session::get('customer')->PIN;
-          $fleet->ChasisNo=Input::get('ChasisNo');
-          $fleet->CustomerId=Session::get('customer')->CustomerID;
-          $fleet->OwnerName=$OwnerData->names;
-          $fleet->Make=$DataOfVehicle['make'];
-          $fleet->Model=$DataOfVehicle['model'];
-  
-          if($fleet->save()){
-             //Get Any Fleets Registered Under the Company If ANy
-    
-            Session::flash('message','Fleet registered successfully');
-                return Redirect::back();
+          //Extract PIN No of the Owner
+          $OwnerData = (object)$DataOfVehicle['owner'][0];
+          $OurDatabaseResult = $this->IsVehicleRegisteredInOurDatabase($RegNo);
+          if($OurDatabaseResult === false){ //Not In Our Db
+            $DirectorResult = $this->IsVehicleOwnedByCompanyDirector($OwnerData->pin);
+            $VehicleResult = $this->IsVehicleOwnedByCompany($OwnerData->pin);
+      
+            //If Vehicle is Owned By Director or Org. Register It
+            if($DirectorResult === true || $VehicleResult === true){
+              // Register the Damn Vehicle
+              $fleet = new CustomerFleet();
+              $fleet->RegNo=$RegNo;
+              $fleet->OwnerPIN=Session::get('customer')->PIN;
+              // $fleet->ChasisNo=Input::get('ChasisNo');
+              $fleet->CustomerId=Session::get('customer')->CustomerID;
+              $fleet->OwnerName=$OwnerData->names;
+              $fleet->Make=$DataOfVehicle['make'];
+              $fleet->Model=$DataOfVehicle['model'];
+      
+              if($fleet->save()){
+                 //Get Any Fleets Registered Under the Company If ANy
+        
+                Session::flash('message','Fleet registered successfully');
+                    return Redirect::back();
+              }
+            }else{
+              Session::flash('message', 'Please Ensure The Vehicle is Owned by the Organization or either of Company Directors');
+              return Redirect::route('dashboard.fleet');
+            }
+          }else{
+            Session::flash('message', 'The Vehicle is already Registered In Our System');
+            return Redirect::route('dashboard.fleet');
           }
-        }else{
-          Session::flash('message', 'Please Ensure The Vehicle is Owned by the Organization or either of Company Directors');
-          return Redirect::route('dashboard.fleet');
         }
-      }else{
-        Session::flash('message', 'The Vehicle is already Registered In Our System');
+
+        Session::flash('message', 'Vehicle is Not Registered With NTSA');
         return Redirect::route('dashboard.fleet');
-      }
     }
-    Session::flash('message', 'Vehicle is Not Registered With NTSA');
-    return Redirect::route('dashboard.fleet');
+
+    Session::flash('message', $IsAllowed);
+        return Redirect::route('dashboard.fleet');
       
 
   } 
-  
+  function IsLicenceAllowedToRegisterFleets($LicenceNo){
+
+   
+
+    $PermitInfo =Permits::with('Service')
+                      ->where('id', $LicenceNo)->get();
+    // $Data = null;              
+    foreach($PermitInfo as $Info){
+      $Data = $Info->Service;              
+    }
+    if(is_object($Data)){
+      $ExpiryDate = new DateTime($Data->ExpiryDate);
+      $TodayDate = new DateTime("now");
+
+      if($Data->ServiceID == 46 || $Data->ServiceID ==45 ){
+
+          //Check If Licence Belongs to the Customer
+          
+            if(!$Data->CustomerID ==  Session::get('customer')->CustomerID ){
+              return $msg ='This Licence is not Linked to Your Profile';
+            }
+            //Look at it's  Expiry Date
+            if($TodayDate > $ExpiryDate ){
+              return $msg ='Your Licence is Exprired, Kindly renew and Add the Vehicle';
+            }
+          //Licence Passed All Condition
+          return true;
+      }
+      else{
+      return $msg ='Only Tours and Travel, and Tourism Vehicle Hire are Allowed to Add Vehicles';
+
+      }
+    }
+    //Licence is Not Linked to a Service
+    return $msg ='Your Licence Seems to Have Been Deleted! Ooops....';
+    
+  }
   function IsVehicleOwnedByCompanyDirector($PinToCheck){
     // var_dump($PinToCheck);
     $BusinessId=Session::get('customer')->CustomerID;

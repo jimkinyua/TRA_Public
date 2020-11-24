@@ -65,6 +65,8 @@ Route::group([], function()
 		Route::get('profile',['as'=>'my.profile','uses'=>'UsersController@showMyProfile']);
 		Route::get('businessprofile/{cid}',['as'=>'business.profile','uses'=>'UsersController@businessProfile']);
 		Route::post('businessprofile',['as'=>'update.business.profile','uses'=>'BusinessController@postUpdateBusiness']);
+		Route::get('removeDirector/{directorid}',['as'=>'business.removedirector','uses'=>'BusinessController@removeDirector']);
+
 		# dashboard menu
 		Route::get('home/{id}', ['as' => 'portal.home', 'uses' => 'DashboardController@home']);
 		Route::get('manage', ['as' => 'portal.manage', 'uses' => 'DashboardController@manage']);
@@ -307,3 +309,4 @@ Route::group(['prefix'=>'api'],function(){
 	Route::get('departments', [ 'as' => 'api.departments', 'uses' => 'ApiController@departments' ]);
 	Route::get('categories/{department}', [ 'as' => 'api.categories', 'uses'=>'ApiController@categories']);
 });
+
