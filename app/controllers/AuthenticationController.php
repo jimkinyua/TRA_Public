@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Validator;
+// session_start();
 
 class AuthenticationController extends \BaseController {
 
@@ -39,16 +40,20 @@ class AuthenticationController extends \BaseController {
 
             if($user) 
             {
-              if($user->Active == false) {
+              if($user->Active == false ) {
                 Session::flash('error_msg','Account not activated');
                 return Redirect::route('portal.login');
               }
               if ($user->ChangePassword){
-                  Session::put('user__',$user->Email);
+
+                Session::flash('error_msg','Your Account Password was Reset Kindly Use
+                 the Link Sent To Your Email To Log In');
+                 return Redirect::route('portal.login');
+                    //   Session::put('user__',$user->Email);
 
                   Auth::logout();
 
-                  return Redirect::route('get.change.password');
+                  return Redirect::route('portal.login');
               }
               #return Redirect::intended(route('portal.dashboard'));
               Session::set('password', Input::get('password'));
@@ -395,76 +400,121 @@ class AuthenticationController extends \BaseController {
     }
 
     public function getChangePassword()  {
+        $user__ = Session::get('user__');
+        Session::forget('user__');
         // exit('Hapa');
         Session::put('change_password_token', csrf_token());
         //dd(['user__'=>Session::get('user__'),'change_password_token'=>Session::get('change_password_token')]);
-        $user__ = Session::get('user__');
+        
         // echo '<pre>';
         // print_r($user__);
         // exit;
 
         // dd($user__);
-        Session::forget('user__');
+       
 
         return View::make('authentication.reset',['user__'=>$user__,'change_password_token'=>Session::get('change_password_token')]);
+    }
+
+    public function ResetUserPassWord($code){
+        $user = Api::FindAgentBy('ConfirmationToken',$code);
+        //print_r($user);die();
+        if ($user){
+            if ($user->ChangePassword){
+                if ($user->ConfirmationToken === $code){
+                    Session::put('user__',$user->Email);
+                    $user->ConfirmationToken = '';
+                    $user->save();
+                    Session::put('change_password_token', csrf_token());
+                    return View::make('authentication.reset',['user__'=>$user->Email,
+                    'change_password_token'=>Session::get('change_password_token')]);
+                   
+                }
+            }
+        }
+
+        Session::flash('error_msg', 'Unable to activate user Try again later or contact Support Team.');
+        return Redirect::to('/login');
     }
 
     public function changePassword() {
         // exit(1);
         $token = Session::get('change_password_token');
         // echo '<pre>';
-        // print_r($token);
+        // print_r(Input::all());
         // exit;
 
         $rules = array(
-            'user__'=>'required|exists:UserProfile,Email',
-            // 'change_password_token'=>"required|in:$token",
-            // 'password'=>'required|min:6',
+            'user__'=>'required|exists:Agents,Email',
+            'change_password_token'=>"required|in:$token",
+            'password'=>'required|min:6',
         );
         $messages = array(
             'in' => 'Invalid request token',
         );
 
        
-        if(Input::get('email')) {
-        //                echo '<pre>';
-        // print_r(Input::get('email'));
-        // exit;
+        if(Input::get('email')) { 
+
+            // echo '<pre>';
+            // print_r(Input::get('email'));
+            // exit;
           $rules = [ 'email' => 'required|exists:Agents,Email' ];
-        //   $messages = [ 'email.exists' => 'Invalid Email Address' ];
+          $messages = [ 'email.exists' => 'Sorry We Could Not Find A Profile Under the Provided Email' ];
           $valid = Validator::make(Input::all(),$rules,$messages);
-        //           echo '<pre>';
-        // print_r($valid);
-        // exit;
+            // echo '<pre>';
+            // print_r($valid);
+            // exit;
           if($valid->passes()) 
           {
-            //   exit('hapa');
-            Session::put('user__', Input::get('email'));
+              //Send Email To Email with Rest Token
+              $user = Agent::where('Email',Input::get('email'))->first();
+
+              $user->ConfirmationToken = md5(uniqid(mt_rand(), true));
+              $user->ChangePassword = true;
+              if($user->save()){
+
+                $data['FirstName'] = $user->FirstName;
+                $data['email'] = $user->Email;
+                $data['LastName'] = $user->LastName;
+                $data['MiddleName'] = $user->MiddleName;
+                $data['password'] = $user->password;
+                $data['confirm_token'] = $user->ConfirmationToken;
+                $data['EmailTitle'] = 'PassWord Reset';
+                $data['subject'] = $data['EmailTitle'];
+                Api::sendMail('PassWordReset',$data);
+                
+                Session::flash('message','Confrimation Email Sent Successfully');
+                return Redirect::back();
+              }
             Redirect::action('AuthenticationController@getChangePassword');
           }
-        //   exit('invalid');
+         //   exit('invalid');
           return Redirect::action('AuthenticationController@getChangePassword')
               ->withErrors($valid);
         }
-
+        // exit('Nooooma');
         $valid = Validator::make(Input::all(),$rules,$messages);
         if ($valid->passes())
         {
+            
+          
             $pass = Hash::make(Input::get('password'));
 
             //dd($pass);
 
             $user = Agent::where('Email',Input::get('user__'))->first();
             $user->password = $pass;
-            $user->ChangePassword = '';
+            $user->ChangePassword = false;
             $user->save();
             
             Session::flash('success_msg','You have successfully changed your password');
             return Redirect::route('portal.home');
-        }
-        var_dump($valid->errors());die();
-        return Redirect::action('AuthenticationController@getChangePassword')
+        }else{
+            return Redirect::action('AuthenticationController@getChangePassword')
             ->withErrors($valid);
+        }
+        
     }
 
     public function getUsersList(){

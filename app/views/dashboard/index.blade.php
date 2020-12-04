@@ -62,9 +62,23 @@
       <a class="item" id="manage" href="{{route('portal.manage')}}">
         <i class="tasks icon"></i> Dashboard
       </a>
+    
       @if(Session::get('customer')->Type == 'business')
+        <?php
+        // echo '<pre>';
+        //   print_r(Session::get('customer'));
+        //   exit;
+
+
+        ?>
       <a class="item" id="services" href="{{route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ])}}">
-        <i class="tasks icon"></i> Services 
+        <i class="tasks icon"></i> Apply for Business Services
+      </a>
+      @endif
+
+      @if(Session::get('customer')->Type == 'individual')
+      <a class="item" id="services" href="{{route('portal.individual', [ 'id' =>  Session::get('customer')->CustomerID ])}}">
+        <i class="tasks icon"></i> Apply for Individual Services 
       </a>
       @endif
 

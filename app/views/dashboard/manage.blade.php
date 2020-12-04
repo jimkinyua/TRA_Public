@@ -6,10 +6,10 @@
 
         <div class="item"> </div>
         @if(Session::get('customer')->Type !== 'business')
-        <a class="item" href="{{route('portal.accounts', [ 'cid' => Session::get('customer')->id() ])}}"> My Business Accounts </a>        
-        @else
-        <?php $xxxx = CustomerAgent::where('AgentID', Auth::User()->id())->where('AgentRoleID', 1)->pluck('CustomerID'); ?>
-        <a class="item" href="{{route('switch.account', [ 'cid' => $xxxx ])}}"> Switch to Individual Account </a>        
+            <a class="item" href="{{route('portal.accounts', [ 'cid' => Session::get('customer')->id() ])}}"> My Business Accounts </a>        
+            @else
+            <?php $xxxx = CustomerAgent::where('AgentID', Auth::User()->id())->where('AgentRoleID', 1)->pluck('CustomerID'); ?>
+            <a class="item" href="{{route('switch.account', [ 'cid' => $xxxx ])}}"> Switch to Individual Account </a>        
 
         @endif
         <div class="item"> </div>

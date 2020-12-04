@@ -20,6 +20,8 @@ class ServiceGroup extends Eloquent {
         return $this->hasMany('Category','ServiceGroupID')->where('PrimaryService', 1);
     }
 
+   
+
     public function department()
     {
         return $this->belongsTo('Department','DepartmentID');

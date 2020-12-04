@@ -6,8 +6,8 @@ class ApplicationsController extends Controller {
   {
 
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
-	 //dd(Session::get('customer'));
-$data = DB::table('ServiceHeader')
+	  //dd(Session::get('customer'));
+    $data = DB::table('ServiceHeader')
       ->select(['ServiceHeader.ServiceHeaderID',
             'ServiceHeader.PermitNo as No',
             'Services.ServiceName',
@@ -1139,7 +1139,7 @@ $ServiceCategoryID = DB::table('ServiceHeader')
  
 
     $formID = DB::table('ServiceCategory')->where('ServiceCategoryID', Input::get('CategoryNumber'))->pluck('FormID');
-// exit($formID);
+    // exit($formID);
     $form = ServiceForm::findOrFail($formID);
     foreach($form->sections() as $section){
       foreach($section->columns() as $field) {
@@ -1167,16 +1167,23 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     $app->FormID = $formID; //Input::get('form_id');
     $app->SubmissionDate = date('Y-m-d H:i:s');
     $app->ServiceID = Input::get('service_id');
-    $app->SubSystemID = Session::get('customer')->BusinessZone;
+    
+    if(Session::get('customer')->Type == 'individual'){
+      $app->SubSystemID =2;
+    }else{
+      $app->SubSystemID =(Session::get('customer')->BusinessZone);
+
+    }
+
     $app->ServiceHeaderType = $this->getType($CategoryID);
     // $app->ServiceCategoryId = Input::get('CategoryNumber');
     $app->ServiceCategoryId = (Input::get('CategoryNumber'))?Input::get('CategoryNumber'):0;
     $app->CustomerID = (Session::get('customer')->CustomerID);
     $app->ServiceHeaderType = (is_null($form->ServiceHeaderType) ? 4 : $form->ServiceHeaderType);
     
-// echo '<pre>';
-//     print_r($app);
-//     exit;
+    // echo '<pre>';
+    //     print_r($app);
+    //     exit;
     $app->save();
 
     $HeaderId = $app->id();
@@ -1204,36 +1211,46 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     //
     $x=$this->uploadFiles($HeaderId,$input);
 
-       
-    //Assign Application to Inspectors Where The User Region Is
-    $InspectionOfficers = DB::table('Users')
-    ->select(['Users.Email',
-              'Users.UserID',
-              'Agents.AgentID',
-              'Agents.FirstName',
-              'Agents.Middlename',
-              'Agents.LastName',
-              ])
-    ->where('Users.RegionID', Session::get('customer')->BusinessZone)
-    ->join('Agents','Users.AgentID','=','Agents.AgentID')
-    ->get();
+
+    //No Inspection for Individuals
+    if(Session::get('customer')->Type == 'business'){
+      //Assign Application to Inspectors Where The User Region Is
+      $InspectionOfficers = DB::table('Users')
+      ->select(['Users.Email',
+                'Users.UserID',
+                'Agents.AgentID',
+                'Agents.FirstName',
+                'Agents.Middlename',
+                'Agents.LastName',
+                ])
+      ->where('Users.RegionID', Session::get('customer')->BusinessZone)
+      ->join('Agents','Users.AgentID','=','Agents.AgentID')
+      ->get();
 
         //Get A random One
-    $InspectionOfficer=$InspectionOfficers[array_rand($InspectionOfficers)]; 
+      $InspectionOfficer=$InspectionOfficers[array_rand($InspectionOfficers)]; 
 
-    $Inspections = new Inspections(); 
-  
-    $Inspections->ServiceHeaderID = $HeaderId;
-    $Inspections->UserID = $InspectionOfficer->AgentID; //Input::get('form_id');
-    $Inspections->InspectionStatusID = 1;
-    $Inspections->CreatedDate = date('Y-m-d H:i:s');
-    $Inspections->save();
+      $Inspections = new Inspections(); 
+    
+      $Inspections->ServiceHeaderID = $HeaderId;
+      $Inspections->UserID = $InspectionOfficer->AgentID; //Input::get('form_id');
+      $Inspections->InspectionStatusID = 1;
+      $Inspections->CreatedDate = date('Y-m-d H:i:s');
+      $Inspections->save();
         
+    }
+
+       
+    
     //get the application Fee
-    $AppFeeServiceID = DB::table('ServicePlus')->where('ServiceID', $app->ServiceID)->pluck('service_add');
-    $InvoiceHeaderID=$this->createInvoice($app->ServiceHeaderID,$app->ServiceID);
+    // $AppFeeServiceID = DB::table('ServicePlus')->where('ServiceID', $app->ServiceID)->pluck('service_add');
+    // $InvoiceHeaderID=$this->createInvoice($app->ServiceHeaderID,$app->ServiceID);
     Session::flash('message','Application Submitted successfully.');
-    return Redirect::route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ]);
+    if(Session::get('customer')->Type == 'business'){
+      return Redirect::route('portal.home', [ 'id' =>  Session::get('customer')->BusinessTypeID ]);
+
+    }
+    return Redirect::route('portal.individual', [ 'id' =>  Session::get('customer')->CustomerID ]);
   }
 
   protected function persistApplicationForSubmit($input) {

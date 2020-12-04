@@ -11,6 +11,7 @@ Route::group([], function()
 	Route::get('register', ['as' => 'portal.get.register', 'uses' => 'AuthenticationController@getRegister']);
 	Route::post('register', ['as'=>'portal.post.register', 'uses' => 'AuthenticationController@postRegister']);
 	Route::get('activate/{code}', [ 'as'=> 'activate.portal.user', 'uses'=>'AuthenticationController@activate']);
+	Route::get('reset/{code}', [ 'as'=> 'reset.portal.user', 'uses'=>'AuthenticationController@ResetUserPassWord']);
 	Route::get('financebill', ['as' => 'portal.services', 'uses' => 'DashboardController@services']);
 	Route::get('servicecategory/{cat}', ['as' => 'portal.category', 'uses' => 'DashboardController@category']);
 	Route::get('filterselect/{FilterColumnID}/{SelectedID}', ['as' => 'filter.selects', 'uses' => 'ServicesController@filterSelect']);
@@ -68,7 +69,8 @@ Route::group([], function()
 		Route::get('removeDirector/{directorid}',['as'=>'business.removedirector','uses'=>'BusinessController@removeDirector']);
 
 		# dashboard menu
-		Route::get('home/{id}', ['as' => 'portal.home', 'uses' => 'DashboardController@home']);
+		Route::get('businesshome/{id}', ['as' => 'portal.home', 'uses' => 'DashboardController@home']);
+		Route::get('home/{id}', ['as' => 'portal.individual', 'uses' => 'DashboardController@individualservices']);
 		Route::get('manage', ['as' => 'portal.manage', 'uses' => 'DashboardController@manage']);
 		Route::get('support', ['as' => 'portal.support', 'uses' => 'DashboardController@support']);
 		Route::get('dashboard', ['as' => 'portal.dashboard', 'uses' => 'DashboardController@home']);
