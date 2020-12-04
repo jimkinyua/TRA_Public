@@ -5,7 +5,7 @@
   <div class="ui orange attached segment">
     <h2 class="ui center aligned icon header">
       <i class="circular hide icon"></i>
-      Nothing Here!
+      {{-- Nothing Here! --}}
       <div class="sub header">You have not yet applied for any service</div>
     </h2>
   </div>

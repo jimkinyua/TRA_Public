@@ -3,8 +3,54 @@
 class DashboardController extends Controller {
 
   public function home() {
-
+    if(Session::get('customer')->Type == 'business'){
+      $customerType = DB::table('Customer')
+      ->select(['Customer.BusinessTypeID',
+                'Customer.CustomerName'])  
+      ->where('Customer.CustomerID',Session::get('customer')->CustomerID)
+      ->pluck('BusinessTypeID');      
+      // exit($customerType);
+    }
+    // return 9099;
+    //return View::make('welcome');
     
+   
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])
+    ->where('ServiceGroupID', $customerType)
+    ->orWhere(function($query)
+            {
+                $query->orwhere('ServiceGroupID', '=', 11)
+                      ->orwhere('ServiceGroupID', '=', 12);
+            })
+    ->get();
+
+   
+  
+    $data = DB::table('ServiceHeader')
+        ->select(['ServiceHeader.ServiceHeaderID',
+            'ServiceHeader.PermitNo as No',
+            'Services.ServiceName',
+            'ServiceHeader.CreatedDate as Date',
+            'ServiceStatus.ServiceStatusDisplay'])
+        ->where('ServiceHeader.CustomerID', Session::get('customer')->CustomerID)
+        ->join('Customer','Customer.CustomerID','=','ServiceHeader.CustomerID')
+        ->join('Services','Services.ServiceID','=','ServiceHeader.ServiceID')
+        ->join('ServiceStatus','ServiceStatus.ServiceStatusID','=','ServiceHeader.ServiceStatusID')
+        ->get();
+
+    // echo '<pre>';
+    // print_r($bill);
+    // exit;
+
+  
+    return View::make('dashboard.home', [ 'applications'=> $data, 'bill' => $bill, ]);
+  }
+  
+  
+
+  public function individualservices($id) {
+
+    // exi('');
     //return View::make('welcome');
     
     $customerType = DB::table('Customer')
@@ -14,12 +60,12 @@ class DashboardController extends Controller {
       ->pluck('BusinessTypeID');      
 
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])
-    ->where('ServiceGroupID', $customerType)
-    ->orWhere(function($query)
-            {
-                $query->orwhere('ServiceGroupID', '=', 11)
-                      ->orwhere('ServiceGroupID', '=', 12);
-            })
+    //->where('ServiceGroupID', $customerType)
+    // ->orWhere(function($query)
+    //         {
+    //             $query->orwhere('ServiceGroupID', '=', 11)
+    //                   ->orwhere('ServiceGroupID', '=', 12);
+    //         })
     ->get();
 
    
@@ -429,11 +475,11 @@ class DashboardController extends Controller {
     $categoryName = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('CategoryName');
     $categoryID = DB::table('ServiceCategory')->where('ServiceCategoryID', intval($cat))->pluck('ServiceCategoryID');
 
-    if(Session::get('customer')->Type == 'individual' && $FormID == 2) 
-    {
-      Session::flash('message', 'Switch to a business account to apply for a Licence');
-      return Redirect::route('portal.dashboard');
-    }
+    // if(Session::get('customer')->Type == 'individual' && $FormID == 2) 
+    // {
+    //   Session::flash('message', 'Switch to a business account to apply for a Licence');
+    //   return Redirect::route('portal.dashboard');
+    // }
 
     $form = ServiceForm::findOrFail($FormID);
    

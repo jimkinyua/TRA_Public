@@ -1,77 +1,76 @@
 @extends('portal')
 
 @section('content')
-<div class="ui padded basic segment">
-  <div id="window">
-    <div class="ui segment centered grid">
-        <div class="eight wide column">
+  <div class="ui padded basic segment">
+    <div id="window">
+      <div class="ui segment centered grid">
+          <div class="eight wide column">
 
-          <div class="">
-            @if (count($errors) > 0)
-              <div class="ui red segment">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                <ul class="ui selection list">
-                  @foreach ($errors->all() as $error)
-                    <li class="item">{{ $error }}</li>
-                  @endforeach
-                </ul>
-              </div>
-            @endif
-            <form action="@if (!isset($change_password_token)){{route('post.reset')}}
-  					              @else {{route('post.change.password')}} @endif"  method="POST" class="ui basic segment form">
-
-  						<input type="hidden" name="_token" value="{{ csrf_token() }}">
-
-  						@if (!isset($user__))
-  						<div class="required field">
-  							<label>E-Mail Address</label>
-  							<div class="ui icon input">
-  								<input type="email" placeholder="Username" name="email" value="{{ Input::old('email') }}">
-                  <i class="user icon"></i>
-  							</div>
-  						</div>
-  						@else
-  							<input type="hidden" name="user__" value="{{$user__}}">
-  							<input type="hidden" name="change_password_token" value="{{Session::get('change_password_token')}}">
-                
-    						<!-- <div class="required field">
-                  <label>Current Password</label>
-                  <div class="ui icon input">
-                    <input type="password" name="current">
-                    <i class="lock icon"></i>
+            <div class="">
+                @if (count($errors) > 0)
+                  <div class="ui pink segment">
+                    <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                    <ul class="ui selection list">
+                      @foreach ($errors->all() as $error)
+                        <li class="item">{{ $error }}</li>
+                      @endforeach
+                    </ul>
                   </div>
-                </div> -->
+                @endif
+              <form action="@if (!isset($change_password_token)){{route('post.reset')}}
+                              @else {{route('post.change.password')}}
+                            @endif"  method="POST" class="ui basic segment form">
+                  <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-                <div class="required field">
-    							<label>New Password</label>
-    							<div class="ui icon input">
-    								<input type="password" name="password">
-                    <i class="lock icon"></i>
-    							</div>
-    						</div>
+                  @if (!isset($user__)) <!-- No User Found -->
+                      <div class="required field">
+                        <label>E-Mail Address 55</label>
+                        <div class="ui icon input">
+                          <input type="email" placeholder="Email Address" name="email" value="{{ Input::old('email') }}">
+                          <i class="user icon"></i>
+                        </div>
+                      </div>
+                  @else
+                      <input type="hidden" name="user__" value="{{$user__}}">
+                      <input type="hidden" name="change_password_token" value="{{Session::get('change_password_token')}}"> 
+                      <div class="required field">
+                        <label>Current Password</label>
+                        <div class="ui icon input">
+                          <input type="password" name="current">
+                          <i class="lock icon"></i>
+                        </div>
+                      </div> 
 
-    						<!-- <div class="required field">
-    							<label>Confirm Password</label>
-    							<div class="ui icon input">
-    								<input type="password" name="password_confirmation">
-                    <i class="lock icon"></i>
-    							</div>
-    						</div> -->
-                
-              @endif
+                      <div class="required field">
+                        <label>New Password</label>
+                        <div class="ui icon input">
+                          <input type="password" name="password">
+                          <i class="lock icon"></i>
+                        </div>
+                      </div>
 
-              <button type="submit" class="ui fluid teal button">
-                Reset Password
-              </button>
+                      <div class="required field">
+                          <label>Confirm Password</label>
+                          <div class="ui icon input">
+                            <input type="password" name="password_confirmation">
+                            <i class="lock icon"></i>
+                          </div>
+                      </div> 
+                    
+                  @endif
 
-  					</form>
+                  <button type="submit" class="ui fluid teal button">
+                    Reset Password
+                  </button>
+
+              </form>
+              
+            </div>
 
           </div>
-
       </div>
     </div>
   </div>
-</div>
 
 @endsection
 

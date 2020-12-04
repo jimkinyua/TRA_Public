@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => 'passdevelopment00@gmail.com', 'name' => 'TRA TESTS'),
+	'from' => array('address' => 'omonsotest@gmail.com', 'name' => 'TRA TESTS'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -80,7 +80,7 @@ return array(
 	|
 	*/
 
-	'username' => 'passdevelopment00@gmail.com',
+	'username' => 'omonsotest@gmail.com',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -93,7 +93,7 @@ return array(
 	|
 	*/
 
-	'password' => 'cyvkhicsdngecuvf',
+	'password' => 'omonso001',
 
 	/*
 	|--------------------------------------------------------------------------
