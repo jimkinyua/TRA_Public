@@ -27,11 +27,33 @@
     <div class="two fields">
       <div class="required field">
         <label>ID/Passport Number</label>
-        <input type="text" name="IDNumber" placeholder="National ID Number" value="{{ Input::old('IDNumber') }}">
+        <input type="text" name="IDNO" placeholder="National ID Number" value="{{ Input::old('IDNumber') }}">
       </div>
       <div class="required field">
         <label>Mobile Number</label>
-        <input type="number" name="Mobile" placeholder="Mobile Phone Number" value="{{ Input::old('Mobile') }}">
+        <input type="number" name="Mobile1" placeholder="Mobile Phone Number" value="{{ Input::old('Mobile') }}">
+      </div>
+    </div>
+
+    <div class="ui hidden divider"></div>
+    <h4 class="ui horizontal header divider"> Residency Information </h4>
+
+    <div class="two fields">
+      <div class="required field">
+        <label>Town</label>
+        <input type="text" name="Town" placeholder="Town" value="{{ Input::old('IDNumber') }}">
+      </div>
+      <div class="required field">
+        <label>County</label>
+        <select name="County" id="County"> 
+            <option selected  disabled> --Please choose an option-- </option>
+            @foreach($Counties as $County)
+              <option value=" {{$County->CountyId}}">{{$County->CountyName}}</option>
+            @endforeach()
+
+        
+         
+      </select>
       </div>
     </div>
 
@@ -64,7 +86,7 @@
         </div>
       </div>
       <div class="required field">
-        <label>Password Confirmation</label>
+        <label> Confirm Password </label>
         <div class="ui icon input">
           <input type="password" name="password_confirmation">
           <i class="lock icon"></i>
@@ -74,7 +96,7 @@
 
     <div class="ui section divider"></div>
 
-    <div class="ui error message">
+    <div class="ui fluid ui red error message">
       <div class="header">We noticed some issues</div>
     </div>
 
@@ -82,7 +104,7 @@
     <div class="ui horizontal divider">
       Already have an account?
     </div>
-    <a class="ui center aligned" href="{{route('portal.login')}}"> Login </a>
+    <a class="ui center aligned pink" href="{{route('portal.login')}}"> Login </a>
 
   </form>
 </div>
@@ -95,7 +117,7 @@
 @section('script')
 <script type="text/javascript">
   $( document ).ready(function() {
-      console.log( "ready!" );
+            
       $('.ui.dropdown').dropdown();
   });
 </script>

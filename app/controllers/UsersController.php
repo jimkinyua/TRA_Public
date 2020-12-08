@@ -542,7 +542,7 @@ class UsersController extends \BaseController {
           'PostalCode' => 4178,
           'Mobile1' => 12240,
           'Telephone1' => 4179,
-          'BusinessZone' => 4187,
+          'County' => 15379,
           'CustomerName' => 4176,
           'PostalAddress' => 4177,
           'BusinessID' => 4184,
@@ -618,6 +618,53 @@ class UsersController extends \BaseController {
         $user = User::findOrFail($id);
         return View::make('auth.profile',['entity'=>$user]);
     }
+    public function updatebusinessProfile($cid){
+        $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+        $customer = Customer::where('CustomerID', intval($cid))->first()->toArray();
+        $form = ServiceForm::findOrFail(1);
+        $fields = [
+          'PIN' => 4182,
+          'Ward' => 4186,
+          'Email' => 4180,
+          'Website' => 4181,
+          'SubCounty' => 4185,
+          'PostalCode' => 4178,
+          'Mobile1' => 12240,
+          'Telephone1' => 4179,
+          'County' => 15379,
+          'CustomerName' => 4176,
+          'PostalAddress' => 4177,
+          'BusinessID' => 4184,
+          'PlotNo' => 12238,
+          'PhysicalAddress' => 12256,
+          'BusinessRegistrationNumber' => 12247,
+          'BusinessTypeID'=>13283
+        ];
 
+        //Get Business Attachements
+
+
+        $BusinessAttacheMents = DB::table('BusinessAttacheMents as BA')
+                                ->where('BA.BusinessNo', $cid)
+                                ->join('BusinessRegistrationDocumentTypes as BRT', 'BRT.DocTypeID', '=', 'BA.DocTypeID')
+                                ->get();
+                                // echo '<pre>';
+                                // print_r($BusinessAttacheMents);
+                                // exit;
+
+         $data = $d = [];
+        foreach ($fields as $key => $value) {
+          if(array_key_exists($key, $customer)) { array_push($data, [ strval($value) => $customer[$key] ]); }
+          else { array_push($data, [ strval($value) => null ]); }
+        }
+
+        foreach($data as $k=>$v) { $i = key($v);  $d[$i] = $v[$i]; }
+        return View::make('auth.updatebusinessprofile', ['bill'=>$bill,
+        'form'=> $form, 
+        'application' => $d,
+        'BusinessAttacheMents'=>$BusinessAttacheMents,
+        ]);
+
+    }
 
 }

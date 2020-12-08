@@ -105,9 +105,10 @@ class DashboardController extends Controller {
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
     $customers = DB::table('CustomerAgents')
       ->where('AgentID', $aid)
+      ->where('Submitted', 1)
       ->orderBy("Customer.CustomerID","desc")
       ->take(100)
-      ->join('Customer', 'Customer.CustomerID', '=', 'CustomerAgents.CustomerID')
+      ->leftjoin('Customer', 'Customer.CustomerID', '=', 'CustomerAgents.CustomerID')
       ->get(['Customer.CustomerName', 'Customer.CustomerID', 'Customer.Mobile1', 'Customer.Email', 'Customer.IDNO', 'Customer.Type']);
 
       //dd($customers);
@@ -115,6 +116,26 @@ class DashboardController extends Controller {
     return View::make('dashboard.accounts', [ 'customers'=> $customers, 'bill' => $bill, ]);
 
   }
+
+  public function unsubaccounts($cid) {
+    $aid = CustomerAgent::where('CustomerID', $cid)->where('AgentRoleID', 1)->pluck('AgentID');
+    $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
+    $customers = DB::table('CustomerAgents')
+      ->where('AgentID', $aid)
+      ->where('Submitted', 0)
+      ->where('Type', 'business')
+      ->orderBy("Customer.CustomerID","desc")
+      ->take(100)
+      ->leftjoin('Customer', 'Customer.CustomerID', '=', 'CustomerAgents.CustomerID')
+      ->get(['Customer.CustomerName', 'Customer.CustomerID', 'Customer.Mobile1', 'Customer.Email', 'Customer.IDNO', 'Customer.Type']);
+
+      //dd($customers);
+
+    return View::make('dashboard.unsubmittedaccounts', [ 'customers'=> $customers, 'bill' => $bill, ]);
+
+  }
+
+  
 
   public function accounts_search($cid) {
     $cid = Session::get('customer')->CustomerID;

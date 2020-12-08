@@ -115,6 +115,8 @@ $ServiceCategoryID = DB::table('ServiceHeader')
   public function renewlicence($ServiceHeaderID) //
   {
     // exit($ServiceHeaderID);
+   
+    
     $bill = ServiceGroup::select(['ServiceGroupName', 'ServiceGroupID'])->get();
 	 //dd(Session::get('customer'));
     $data = DB::table('ServiceHeader')
@@ -129,10 +131,15 @@ $ServiceCategoryID = DB::table('ServiceHeader')
       ->get();
 
       $ServiceId =DB::table('ServiceHeader')
-      ->select(['ServiceID'])
+      ->select(['ServicecategoryID'])
       ->where('ServiceHeader.ServiceHeaderID', $ServiceHeaderID)
       // ->get();
-      ->pluck('ServiceHeader.ServiceID');
+      ->pluck('ServiceHeader.ServicecategoryID');
+
+      $services = Service::where('ServicecategoryID',$ServiceId)->get();
+      // echo '<pre>';
+      // print_r($services );
+      // exit;
       // print_r($ServiceId);
       // exit;
 
@@ -147,7 +154,9 @@ $ServiceCategoryID = DB::table('ServiceHeader')
                   //Get the Renewal Form
           $form = LicenceRenewalForm::findOrFail(2); //2 is For Renewal
           $docs=DB::select('select * from vwRequiredDocuments where ServiceCategoryID=9'); 
-          $StandardRenewalFee =DB::table('ServiceCharges')
+          $StandardRenewalFee =
+
+          DB::table('ServiceCharges')
                             ->select(['Amount'])
                             ->where('ServiceCharges.ServiceID', $ServiceId)
                             // ->get();
@@ -320,7 +329,7 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     // //dd($app);
 
     return View::make('applications.show', [
-      'application' => $app, 'form' => $form, 'Status'=>$ApplicationStatus, 'SavedServiceName'=> $SavedServiceName,  'SavedServiceID'=> $SavedServiceID, 'categoryName'=>$categoryName, 'bill' => $bill, 'service' => $service , 'services' => $services, 'header' => $ServiceHeaderID
+      'application' => $app, 'form' => $form, 'AllowRenew'=>false, 'Status'=>$ApplicationStatus, 'SavedServiceName'=> $SavedServiceName,  'SavedServiceID'=> $SavedServiceID, 'categoryName'=>$categoryName, 'bill' => $bill, 'service' => $service , 'services' => $services, 'header' => $ServiceHeaderID
     ]);
   }
 
@@ -1161,7 +1170,11 @@ $ServiceCategoryID = DB::table('ServiceHeader')
        return Redirect::back()->withErrors($valid)->withInput($input);
        }
     //dd($record);
-    $app = new Application(); 
+    $app = new Application();
+    
+    $TraRegionCode = DB::table('Counties')
+              ->where('CountyId', Session::get('customer')->BusinessZone)
+              ->pluck('TraRegionCode');
   
     $app->ServiceStatusID = 1;
     $app->FormID = $formID; //Input::get('form_id');
@@ -1169,21 +1182,23 @@ $ServiceCategoryID = DB::table('ServiceHeader')
     $app->ServiceID = Input::get('service_id');
     
     if(Session::get('customer')->Type == 'individual'){
-      $app->SubSystemID =2;
+      $app->SubSystemID = $TraRegionCode;
+      $app->ServiceHeaderType = 5; //Individual Licence Applications
+      //$app->SubSystemID =(Session::get('customer')->BusinessZone);
+      $app->ServiceCategoryId = (Input::get('CategoryNumber'))?Input::get('CategoryNumber'):0;
+      $app->CustomerID = (Session::get('customer')->CustomerID);
+     
     }else{
-      $app->SubSystemID =(Session::get('customer')->BusinessZone);
-
+      $app->SubSystemID = $TraRegionCode;
+      $app->ServiceHeaderType = $this->getType($CategoryID);
+      $app->ServiceCategoryId = (Input::get('CategoryNumber'))?Input::get('CategoryNumber'):0;
+      $app->CustomerID = (Session::get('customer')->CustomerID);
+      $app->ServiceHeaderType = (is_null($form->ServiceHeaderType)
+                                   ? 4 : $form->ServiceHeaderType
+                                  );
     }
 
-    $app->ServiceHeaderType = $this->getType($CategoryID);
-    // $app->ServiceCategoryId = Input::get('CategoryNumber');
-    $app->ServiceCategoryId = (Input::get('CategoryNumber'))?Input::get('CategoryNumber'):0;
-    $app->CustomerID = (Session::get('customer')->CustomerID);
-    $app->ServiceHeaderType = (is_null($form->ServiceHeaderType) ? 4 : $form->ServiceHeaderType);
-    
-    // echo '<pre>';
-    //     print_r($app);
-    //     exit;
+ 
     $app->save();
 
     $HeaderId = $app->id();

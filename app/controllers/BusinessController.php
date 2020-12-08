@@ -31,6 +31,39 @@ class BusinessController extends BaseController{
         return View::make('business.new', ['form'=> $form ]);
     }
 
+    public function ViewUpload($id){
+      // exit($id);
+      $Doc = BusinessAttacheMents::where('BusinessRegistationDocID', $id)->get();
+      if($Doc ){
+        $DocPath = $Doc[0]->DocumentPath;
+        $fileName = $Doc[0]->fileName;
+        $FullDocPATH = $DocPath.'/'.$fileName;
+        
+        // echo '<pre>';
+        // print_r( $DocPath);
+        // exit;
+        if(file_exists($FullDocPATH) ){
+          // Header content type 
+          header('Content-type: application/pdf'); 
+          
+          header('Content-Disposition: inline; filename="' . $fileName . '"'); 
+          
+          header('Content-Transfer-Encoding: binary'); 
+          
+          header('Accept-Ranges: bytes'); 
+          
+          // Read the file 
+          readfile($DocPath);
+        }else{
+              return 'File Does Not Exist';
+    
+        }
+
+      }
+      
+      
+  }
+
   
     public function postAddBusiness() {
       
@@ -44,7 +77,7 @@ class BusinessController extends BaseController{
             // 'ColumnID.4179' => 'required|string',
             'ColumnID.4180' => 'required|email',
             'ColumnID.4181' => 'string',
-            // 'ColumnID.11203' => 'required|string',
+            'ColumnID.15379' => 'required|exists:Counties,CountyId',
             // 'ColumnID.11204' => 'required|string',
             // 'ColumnID.11202' => 'required|string'
         ];
@@ -73,25 +106,27 @@ class BusinessController extends BaseController{
 
           'ColumnID.13283.required' => 'Business is Required',
           // 'ColumnID.11204.required' => 'Ward is required.',
-          'ColumnID.12256.required' => 'TRA Region Office Close to the Business is required.',
+          'ColumnID.15379.required' => 'Please Specify The County Where The Business is Located',
         ];
-
-        // echo '<pre>';
-        // print_r(Input::all());
-        // exit;
 
 
 
         //dd(Input::all());
 
         $valid = Validator::make(Input::all(),$rules, $msgs);
+       
 
         if ($valid->passes()){
+          $col = Input::get('ColumnID');
+          //Get Region Associated With The County Selected
+          // $TraRegionCode = DB::table('Counties')
+          //     ->where('CountyId', $col[15379])
+          //     ->pluck('TraRegionCode');
+
             DB::beginTransaction();
             try{
               
               $input = Input::all();
-              $col = Input::get('ColumnID');
               $agent = Auth::user();
 
               $customer = Customer::create([
@@ -109,7 +144,7 @@ class BusinessController extends BaseController{
                 // 'Telephone1' => $col[4179],
                 'BusinessTypeID' => $col[13283],
                 'CustomerTypeID' => $col[13283],
-                'BusinessZone' => $col[12256],
+                'County' => $col[15379],
                 'CustomerName' => $col[4176],
                 'PostalAddress' => $col[4177],
                 'BusinessID' => $col[4184], //Business Permit NO (If the business has a permit)
@@ -140,7 +175,9 @@ class BusinessController extends BaseController{
                 ->where('AgentID', $agent->id())
                 ->join('Customer', 'Customer.CustomerID', '=', 'CustomerAgents.CustomerID')
                 ->get(['Customer.CustomerName', 'Customer.CustomerID', 'Customer.Type']);
-
+                // ECHO '<PRE>';
+                // print_r(Input::all());
+                // exit;
             // customers is a list of accounts that the logged in agent can represent
             Session::set('customers', $customers);
             return Redirect::route('add.Directors', [ 'id' => $customer->id() ]);
@@ -173,17 +210,17 @@ class BusinessController extends BaseController{
     
                 $destination=$destinationPath."/".$DocTypeId."/".$BusinessNo;
 
-                  //
+                  //C:\inetpub\wwwroot\TRA\TRA_Public\app\storage/uploads/3/336704/dummy Doc.pdf
                 if (!file_exists($destination)) {
                   mkdir($destination, 0777, true);
                 }
-                $DocumentPath=$destination."/".$fileName;
+                // $DocumentPath=$destination."/".$fileName;
              
-                $FileData->move($DocumentPath, $fileName);            
+                $FileData->move($destination, $fileName);            
                 $document = new BusinessAttacheMents();
                 $document->BusinessNo = $ApplicantId;
                 $document->DocTypeId = $DocTypeId;
-                $document->DocumentPath=$DocumentPath;
+                $document->DocumentPath=$destination;
                 $document->FileName=$fileName;
                 $document->IsCurrent =true;
                 $document->save();
@@ -357,7 +394,9 @@ class BusinessController extends BaseController{
             'ColumnID.12240' => 'required|string',
             'ColumnID.4180' => 'required|email',
             'ColumnID.4181' => 'string',
-            'ColumnID.13283' => 'required',
+            'ColumnID.13283' => 'required', 
+            'ColumnID.15379' => 'required|exists:Counties,CountyId',
+
           //  'ColumnID.4185' => 'required|string',
           //  'ColumnID.4186' => 'required|string',
           //  'ColumnID.4187' => 'required|string'
@@ -413,7 +452,7 @@ class BusinessController extends BaseController{
               'Mobile1' => 2240,
               'Telephone1' => 4179,
               'CustomerTypeID' => 13283,
-              'BusinessZone' => 11202,
+              'County' => 15379,
               'CustomerName' => 4176,
               'PostalAddress' => 4177,
               'BusinessID' => 4184,
@@ -454,6 +493,7 @@ class BusinessController extends BaseController{
             Session::set('customers', $customers);
 
             Session::flash('message','Business account profile updated successfully');
+            return Redirect::route('add.Directors', [ 'id' => $customer->id() ]);
             return Redirect::route('portal.home', ['id'=> Session::get('customer')->BusinessTypeID]);
         }
 
@@ -474,29 +514,22 @@ class BusinessController extends BaseController{
 
     public function submitbusiness($id) {
 
+      $NumberOfDirectors  = Directors::where('CompanyID', $id)->count();
+      if( $NumberOfDirectors > 0){ //AlloW Submit
+
         $Customer = Customer::find($id);
-           //Get Agent ID
-           $record = DB::table('CustomerAgents')->where('CustomerID', $id)
-           ->get([
-             'AgentID'
-             ]);
-             if($record){
-              $AgentId = $record[0]->AgentID;
+        if($Customer) {
+          $Customer->update(['Submitted'=>1]);
+          Session::flash('message','Business registered successfully');
+          return Redirect::route('portal.accounts', [ 'id' =>  Session::get('customer')->CustomerID ]);
+        }
 
-             }
-      if($Customer) {
-        $Customer->update(['Submitted'=>1]);
+        Session::flash('error_msg', 'That Record Does not exist');
+        return Redirect::back();
 
-       
-          //  echo '<pre>';
-          //  print_r(Session::get('customer')->CustomerID);
-          //  exit;
-
-            Session::flash('message','Business registered successfully');
-            return Redirect::route('portal.accounts', [ 'id' =>  Session::get('customer')->CustomerID ]);
-      }
-      Session::flash('error_msg', 'That Record Does not exist');
-      return Redirect::route('portal.dashboard');
+      }     
+      Session::flash('error_msg', 'Please Ensure That You have Provided The Owners or Directors of the Company');
+      return Redirect::back();
     }
 
     

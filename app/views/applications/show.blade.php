@@ -4,7 +4,7 @@
 @section('service')
     <h3 class="ui left aligned dividing  header">  {{$service->ServiceName}}  </h3>
 
-    <!-- <form class="ui form"  action="{{ route('update.application') }}" method="post" enctype="multipart/form-data"> -->
+     <form class="ui form"  action="{{ route('portal.home') }}" method="get" enctype="multipart/form-data"> 
         <?php
         // echo '<pre>';
         // print_r($AllowRenew);
@@ -55,7 +55,8 @@
                   <label>Licence Number</label>
                   <div class="ui fitted hidden divider "></div>
 
-                  <input type="text" value="{{$PermitsData[0]['id']}}" disabled="true"></input>
+                  <input type="text" value="{{$service->PermitNo}}" disabled="true"></input>
+                  
               </div>
               <div class="ui fitted hidden divider "></div>
 
@@ -72,10 +73,10 @@
           @else
 
           <div class="required field">
-              <label>Service</label>
+              <label>Service Applied For</label>
               <div class="ui fitted hidden divider"></div>
               <select name="service_id" class="ui dropdown" id="service" disabled>
-                  <option value="0"> Select Service </option>
+                  {{-- <option value="0"> Select Service </option> --}}
                   <?php $selected = (count($services) == 1) ? "selected='selected'" : "" ?>
                   @foreach($services as $service)
                       <option value="{{$service->ServiceID}}" {{$selected}} > <strong> {{$service->ServiceCode}} </strong> {{$service->ServiceName}} </option>

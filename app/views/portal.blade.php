@@ -23,7 +23,7 @@
     <script src="{{asset('js/datedropper.min.js')}}"></script>
     <script src="//cdn.jsdelivr.net/jquery.metadata/2.0/jquery.metadata.min.js"></script>
     <script src="//cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.js"> </script>
     <script type="text/javascript" src="{{asset('js/jquery.plugin.js')}}"></script>
     <script type="text/javascript" src="{{asset('js/jquery.datepick.js')}}"></script>
 4

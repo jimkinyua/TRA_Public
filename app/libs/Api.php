@@ -166,6 +166,15 @@ class Api {
         ";
       }
 
+    //  if($DateField === true){
+    //     echo  "
+    //         <div class='field'>
+    //             <label>$label</label>
+    //             $field
+    //         </div>
+    //     ";
+    //  }
+
     }
 
     public static function ResultArray($q)
@@ -264,6 +273,27 @@ class Api {
                 $label = $col;
                 $width = $col->ColumnSize;
                 $class = 'text';
+                break;
+            case "Date":
+
+                
+
+                $field = "<input type='date' id='".$col->id()."'
+                     name='ColumnID[".$col->id()."]'
+                minlength='4'>";
+                
+                // Form::text("ColumnID[".$col->id()."]", 
+                //                 Input::old($col->id()) ,
+                //                 ['class'=>'ui',
+                //                 'id' => $col->id(),
+                //                 $disabled, 
+                //                 'type'=>'date']
+                //          );
+
+                $label = $col;
+                $width = $col->ColumnSize;
+                $class = 'date';
+                $DateField  = true;
                 break;
             case "File":
                 $field = Form::file("ColumnID[".$col->id()."]");

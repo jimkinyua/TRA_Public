@@ -176,8 +176,12 @@ class AuthenticationController extends \BaseController {
      * Show user registration form
      */
     public function getRegister(){
+        $CountiesInKenya = Counties::select(['CountyName', 'CountyId'])->get();
+        // echo '<pre>';
+        // print_r($CountiesInKenya );
+        // exit;
 
-      return View::make('authentication.register');
+        return View::make('authentication.register', ['Counties'=>$CountiesInKenya]);
     }
 
     /**
@@ -186,14 +190,16 @@ class AuthenticationController extends \BaseController {
      */
     public function postRegister(){
       $rules = array(
-          'Mobile' => 'required|numeric',
-          'IDNumber' => 'required|max:12',
+          'Mobile1' => 'required|numeric|min:10|unique:Customer',
+          'IDNO' => 'required|max:12|min:6|unique:Customer',
           'LastName' => 'required|max:255',
           'FirstName' => 'required|max:255',
           'MiddleName' => 'required|max:255',
           'email_confirmation' => 'same:email',
           'password' => 'required|confirmed|min:6',
           'email' => 'required|email|max:255|unique:Agents',
+          'Town'=>'required',
+          'County'=>'required|exists:Counties,CountyId',
       );
 
       $v = Validator::make(Input::all(),$rules);
@@ -204,14 +210,15 @@ class AuthenticationController extends \BaseController {
         $creds = array(
             'Active'=> 0,
             'ChangePassword' => 0,
-            'Mobile'=>$input['Mobile'],
+            'Mobile'=>$input['Mobile1'],
             'Email' => $input['email'],
-            'IDNO' => $input['IDNumber'],
+            'IDNO' => $input['IDNO'],
             'LastName' =>$input['LastName'],
             'password' => $input['password'],
             'FirstName' => $input['FirstName'],
             'MiddleName' =>$input['MiddleName'],
-            'ConfirmationToken' => md5(uniqid(mt_rand(), true))
+            'ConfirmationToken' => md5(uniqid(mt_rand(), true)),
+            'County'=>$input['County'],
         );
 
         if ($this->register($creds)){
@@ -341,6 +348,7 @@ class AuthenticationController extends \BaseController {
           'ContactPerson' => $agent,
           'Email' => $creds['Email'],
           'Mobile1'=> $creds['Mobile'],
+          'BusinessZone'=>$creds['County'],
         ]);
 
         return CustomerAgent::create([

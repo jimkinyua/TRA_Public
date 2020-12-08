@@ -86,8 +86,8 @@
                 <div class="content">
                     <div class="menu">
                         <a id="register-business" class="item" href="{{route('dashboard.business')}}">Register Businness</a>
+                        <a id="unsubitted-businesses" class="item" href="{{route('portal.unsubmittedaccounts', [ 'cid' => Session::get('customer')->id() ])}}">Unsubmitted Business Accounts</a>
                         <a id="registered-businesses" class="item" href="{{route('portal.accounts', [ 'cid' => Session::get('customer')->id() ])}}">View Registered Accounts</a>
-                    
                     </div>
                 </div>
             </div>

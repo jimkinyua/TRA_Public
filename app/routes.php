@@ -60,11 +60,13 @@ Route::group([], function()
 		Route::post('updatepassword', [ 'as' => 'update.user.password','uses'=>'UsersController@updateUserPassword']);
 
 		Route::get('accounts/{cid}', ['as' => 'portal.accounts', 'uses' => 'DashboardController@accounts']);
+		Route::get('unsubmittedaccounts/{cid}', ['as' => 'portal.unsubmittedaccounts', 'uses' => 'DashboardController@unsubaccounts']);
 		Route::post('accounts/{cid}', ['as' => 'portal.get.accounts', 'uses' => 'DashboardController@accounts_search']);
 
 		Route::get('account', ['as' => 'portal.account', 'uses' => 'SettingsController@account']);
 		Route::get('profile',['as'=>'my.profile','uses'=>'UsersController@showMyProfile']);
 		Route::get('businessprofile/{cid}',['as'=>'business.profile','uses'=>'UsersController@businessProfile']); 
+		Route::get('updatebusinessprofile/{cid}',['as'=>'business.profileupdate','uses'=>'UsersController@updatebusinessProfile']); 
 		Route::post('businessprofile',['as'=>'update.business.profile','uses'=>'BusinessController@postUpdateBusiness']);
 		Route::get('removeDirector/{directorid}',['as'=>'business.removedirector','uses'=>'BusinessController@removeDirector']);
 
@@ -110,7 +112,8 @@ Route::group([], function()
 		Route::get('viewinvoice/{hid}', ['as' => 'application.viewinvoice', 'uses' => 'ApplicationsController@viewinvoice']);
 		Route::get('renewalinvoice/{hid}', ['as' => 'application.renewalinvoice', 'uses' => 'ApplicationsController@renewalinvoice']);
 
-		//
+
+		Route::get('ViewUpload/{id}', ['as' => 'business.uploadview', 'uses' => 'BusinessController@ViewUpload']);
 		Route::get('invoicepdf/{hid}', ['as' => 'application.invoicepdf', 'uses' => 'ApplicationsController@invoicepdf']);
 		Route::get('licencerenewalinvoicepdf/{hid}', ['as' => 'application.licencerenewalinvoicepdf', 'uses' => 'ApplicationsController@licencerenewalinvoicepdf']);
 

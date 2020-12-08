@@ -127,7 +127,10 @@
 
 
         <h3 class="ui dividing header" style="margin-top: 0;">Company Directors Form</h3>
-                          
+        <a class="ui blue  button" href="/updatebusinessprofile/{{$CustomerId}}"> <<< Go Back
+          {{-- <i class="left arrow icon"> Go Back </i> --}}
+        </a>
+                 
         <div class="ui hidden divider"></div>
         <table class="ui compact celled definition table">
             <thead>
@@ -161,7 +164,7 @@
               <tr>
                 <th></th>
                 <th colspan="4">
-                  <div class="ui right floated small primary labeled icon button" id ="AddDirector">
+                  <div class="ui right floated small pink labeled icon button" id ="AddDirector">
                     <i class="user icon"></i> Add Director
                   </div>
   
@@ -179,12 +182,15 @@
                 <p>Submitting False Information Attracts Respective Penalty on the Applicant</p>
             </div>
         </div>
-            {{ Form::submit('Submit', ['class' => 'ui fluid purple button']) }}
+            {{ Form::submit('Submit >>>', ['class' => 'ui fluid green button']) }}
     {{ Form::close() }}
 
 
 
         <div class="ui section divider"></div>
+
+
+   
 
 
 @endsection
